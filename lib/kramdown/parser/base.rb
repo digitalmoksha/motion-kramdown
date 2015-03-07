@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2014 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
 #
 
-# RM require 'kramdown/utils/string_scanner'
+# RM require 'kramdown/utils'
+# RM require 'kramdown/parser'
 
 module Kramdown
 
@@ -51,7 +52,8 @@ module Kramdown
       def initialize(source, options)
         @source = source
         @options = Kramdown::Options.merge(options)
-        @root = Element.new(:root, nil, nil, :encoding => (source.encoding rescue nil), :location => 1)
+        @root = Element.new(:root, nil, nil, :encoding => (source.encoding rescue nil), :location => 1,
+                            :options => {}, :abbrev_defs => {}, :abbrev_attr => {})
         @warnings = []
         @text_type = :text
       end
@@ -88,7 +90,9 @@ module Kramdown
       # +\n+ and makes sure +source+ ends with a new line character).
       def adapt_source(source)
         if source.respond_to?(:encode)
-          raise "The encoding of the source text is not valid!" if !source.valid_encoding?
+          if !source.valid_encoding?
+            raise "The source text contains invalid characters for the used encoding #{source.encoding}"
+          end
           source = source.encode('UTF-8')
         end
         source.gsub(/\r\n?/, "\n").chomp + "\n"

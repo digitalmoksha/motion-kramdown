@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2014 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
@@ -28,7 +28,7 @@ module Kramdown::Converter::SyntaxHighlighter
 
       opts[:wrap] = false if type == :span
 
-      formatter = ::Rouge::Formatters::HTML.new(opts)
+      formatter = (opts.delete(:formatter) || ::Rouge::Formatters::HTML).new(opts)
       formatter.format(lexer.lex(text))
     end
 

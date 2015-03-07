@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2014 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
 #
 
-# RM require 'rexml/parsers/baseparser'
-# RM require 'kramdown/parser/html'
+# RM require 'kramdown/parser'
+# RM require 'kramdown/converter'
+# RM require 'kramdown/utils'
 
 module Kramdown
 
@@ -321,7 +322,9 @@ module Kramdown
 
       def convert_abbreviation(el, indent)
         title = @root.options[:abbrev_defs][el.value]
-        format_as_span_html("abbr", {:title => (title.empty? ? nil : title)}, el.value)
+        attr = @root.options[:abbrev_attr][el.value].dup
+        attr['title'] = title unless title.empty?
+        format_as_span_html("abbr", attr, el.value)
       end
 
       def convert_root(el, indent)
@@ -372,7 +375,9 @@ module Kramdown
         toc.each do |level, id, children|
           li = Element.new(:li, nil, nil, {:level => level})
           li.children << Element.new(:p, nil, nil, {:transparent => true})
-          a = Element.new(:a, nil, {'href' => "##{id}"})
+          a = Element.new(:a, nil)
+          a.attr['href'] = "##{id}"
+          a.attr['id'] = "#{sections.attr['id']}-#{id}"
           a.children.concat(remove_footnotes(Marshal.load(Marshal.dump(children))))
           li.children.last.children << a
           li.children << Element.new(type)

@@ -67,13 +67,15 @@ describe "gfm-to-html conversion" do
    'test/testcases/block/15_math/itex2mml.text',                 # bc no math support yet
    'test/testcases/block/15_math/normal.text',                   # bc no math support yet
    'test/testcases/block/15_math/ritex.text',                    # bc no math support yet
+   'test/testcases/block/15_math/mathjax_preview.text',          # bc no math support yet
+   'test/testcases/block/15_math/mathjax_preview_simple.text',   # bc no math support yet
    'test/testcases/span/math/itex2mml.text',                     # bc no math support yet
    'test/testcases/span/math/normal.text',                       # bc no math support yet
    'test/testcases/span/math/ritex.text',                        # bc no math support yet
    'test/testcases/span/03_codespan/highlighting-rouge.text',    # bc no highlight support yet
    'test/testcases/span/03_codespan/highlighting.text',          # bc no highlight support yet
    'test/testcases_gfm/backticks_syntax.text',                   # bc no highlight support yet
-  ]
+  ].compact
 
   ['testcases', 'testcases_gfm'].each do |item|
     Dir["#{focus_files(testcase_dir(item))}.text"].each do |text_file|
@@ -84,6 +86,7 @@ describe "gfm-to-html conversion" do
       html_file = [(".html.19" if RUBY_VERSION >= '1.9'), ".html"].compact.
         map {|ext| basename + ext }.
         detect {|file| File.exist?(file) }
+      next unless html_file
 
       it "gfm #{short_name(text_file)} --> html" do
         options   = load_options(opts_file)

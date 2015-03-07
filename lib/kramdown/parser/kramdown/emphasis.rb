@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2014 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
@@ -22,7 +22,7 @@ module Kramdown
         element = (result.length == 2 ? :strong : :em)
         type = result[0..0]
 
-        if (type == '_' && @src.pre_match =~ /[[:alnum:]]\z/ && @src.check(/[[:alnum:]]/)) || @src.check(/\s/) ||
+        if (type == '_' && @src.pre_match =~ /[[:alnum:]]\z/) || @src.check(/\s/) ||
             @tree.type == element || @stack.any? {|el, _| el.type == element}
           add_text(result)
           return

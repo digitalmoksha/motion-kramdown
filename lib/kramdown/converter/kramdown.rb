@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2014 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
 #
 
-# RM require 'rexml/parsers/baseparser'
+# RM require 'kramdown/converter'
+# RM require 'kramdown/utils'
 
 module Kramdown
 
@@ -280,17 +281,17 @@ module Kramdown
                   end
           "[#{inner(el, opts)}][#{index}]"
         else
-          title = el.attr['title'].to_s.empty? ? '' : ' "' + el.attr['title'].gsub(/"/, "&quot;") + '"'
+          title = parse_title(el.attr['title'])
           "[#{inner(el, opts)}](#{el.attr['href']}#{title})"
         end
       end
 
       def convert_img(el, opts)
-        alt_text = el.attr['alt'].gsub(ESCAPED_CHAR_RE) { $1 ? "\\#{$1}" : $2 }
+        alt_text = el.attr['alt'].to_s.gsub(ESCAPED_CHAR_RE) { $1 ? "\\#{$1}" : $2 }
         if el.attr['src'].empty?
           "![#{alt_text}]()"
         else
-          title = (el.attr['title'] ? ' "' + el.attr['title'].gsub(/"/, "&quot;") + '"' : '')
+          title = parse_title(el.attr['title'])
           link = if el.attr['src'].count("()") > 0
                    "<#{el.attr['src']}>"
                  else
@@ -369,8 +370,8 @@ module Kramdown
         res = ''
         res << "\n\n" if @linkrefs.size > 0
         @linkrefs.each_with_index do |el, i|
-          title = el.attr['title']
-          res << "[#{i+1}]: #{el.attr['href']}#{title ? ' "' + title.gsub(/"/, "&quot;") + '"' : ''}\n"
+          title = parse_title(el.attr['title'])
+          res << "[#{i+1}]: #{el.attr['href']}#{title}\n"
         end
         res
       end
@@ -389,6 +390,7 @@ module Kramdown
         res = ''
         @root.options[:abbrev_defs].each do |name, text|
           res << "*[#{name}]: #{text}\n"
+          res << ial_for_element(Element.new(:unused, nil, @root.options[:abbrev_attr][name])).to_s << "\n\n"
         end
         res
       end
@@ -413,6 +415,10 @@ module Kramdown
         res = "footnotes" << (res.strip.empty? ? '' : " #{res}") if (el.type == :ul || el.type == :ol) &&
           (el.options[:ial] && (el.options[:ial][:refs] || []).include?('footnotes')) # RM can't use rescue nil
         res.strip.empty? ? nil : "{:#{res}}"
+      end
+
+      def parse_title(attr)
+        attr.to_s.empty? ? '' : ' "' + attr.gsub(/"/, '&quot;') + '"'
       end
 
       # :startdoc:

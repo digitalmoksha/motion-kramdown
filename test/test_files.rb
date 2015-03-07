@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2014 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
@@ -41,10 +41,10 @@ class TestFiles < Minitest::Test
     end
   end
 
-  # Generate test methods for html-to-html conversion
+  # Generate test methods for html-to-{html,kramdown} conversion
   `tidy -v 2>&1`
   if $?.exitstatus != 0
-    warn("Skipping html-to-html tests because tidy executable is missing")
+    warn("Skipping html-to-{html,kramdown} tests because tidy executable is missing")
   else
     EXCLUDE_HTML_FILES = ['test/testcases/block/06_codeblock/whitespace.html', # bc of span inside pre
                           'test/testcases/block/09_html/simple.html', # bc of xml elements
@@ -57,18 +57,34 @@ class TestFiles < Minitest::Test
                           'test/testcases/span/math/ritex.html', # bc of tidy
                           'test/testcases/block/15_math/itex2mml.html', # bc of tidy
                           'test/testcases/span/math/itex2mml.html', # bc of tidy
-                         ]
+                          'test/testcases/block/15_math/mathjax_preview.html', # bc of mathjax preview
+                          'test/testcases/block/15_math/mathjax_preview_simple.html', # bc of mathjax preview
+                         ].compact
+    EXCLUDE_HTML_TEXT_FILES = ['test/testcases/block/09_html/parse_as_span.htmlinput',
+                               'test/testcases/block/09_html/parse_as_raw.htmlinput',
+                              ].compact
     Dir[File.dirname(__FILE__) + '/testcases/**/*.{html,html.19,htmlinput,htmlinput.19}'].each do |html_file|
       next if EXCLUDE_HTML_FILES.any? {|f| html_file =~ /#{f}(\.19)?$/}
       next if (RUBY_VERSION >= '1.9' && File.exist?(html_file + '.19')) ||
         (RUBY_VERSION < '1.9' && html_file =~ /\.19$/)
-      out_file = (html_file =~ /\.htmlinput(\.19)?$/ ? html_file.sub(/input(\.19)?$/, '') : html_file)
-      define_method('test_' + html_file.tr('.', '_') + "_to_html") do
-        opts_file = html_file.sub(/\.html(input)?(\.19)?$/, '.options')
-        opts_file = File.join(File.dirname(html_file), 'options') if !File.exist?(opts_file)
-        options = File.exist?(opts_file) ? YAML::load(File.read(opts_file)) : {:auto_ids => false, :footnote_nr => 1}
-        doc = Kramdown::Document.new(File.read(html_file), options.merge(:input => 'html'))
-        assert_equal(tidy_output(File.read(out_file)), tidy_output(doc.to_html))
+
+      out_files = []
+      out_files << [(html_file =~ /\.htmlinput(\.19)?$/ ? html_file.sub(/input(\.19)?$/, '') : html_file), :to_html]
+      if html_file =~ /\.htmlinput(\.19)?$/ && !EXCLUDE_HTML_TEXT_FILES.any? {|f| html_file =~ /#{f}/}
+        out_files << [html_file.sub(/htmlinput(\.19)?$/, 'text'), :to_kramdown]
+      end
+      out_files.select {|f, _| File.exist?(f)}.each do |out_file, out_method|
+        define_method('test_' + html_file.tr('.', '_') + "_to_#{File.extname(out_file)}") do
+          opts_file = html_file.sub(/\.html(input)?(\.19)?$/, '.options')
+          opts_file = File.join(File.dirname(html_file), 'options') if !File.exist?(opts_file)
+          options = File.exist?(opts_file) ? YAML::load(File.read(opts_file)) : {:auto_ids => false, :footnote_nr => 1}
+          doc = Kramdown::Document.new(File.read(html_file), options.merge(:input => 'html'))
+          if out_method == :to_html
+            assert_equal(tidy_output(File.read(out_file)), tidy_output(doc.send(out_method)))
+          else
+            assert_equal(File.read(out_file), doc.send(out_method))
+          end
+        end
       end
     end
   end
@@ -93,8 +109,9 @@ class TestFiles < Minitest::Test
   else
     EXCLUDE_LATEX_FILES = ['test/testcases/span/01_link/image_in_a.text', # bc of image link
                            'test/testcases/span/01_link/imagelinks.text', # bc of image links
+                           'test/testcases/span/01_link/empty_title.text',
                            'test/testcases/span/04_footnote/markers.text', # bc of footnote in header
-                          ]
+                          ].compact
     Dir[File.dirname(__FILE__) + '/testcases/**/*.text'].each do |text_file|
       next if EXCLUDE_LATEX_FILES.any? {|f| text_file =~ /#{f}$/}
       define_method('test_' + text_file.tr('.', '_') + "_to_latex_compilation") do
@@ -137,12 +154,14 @@ class TestFiles < Minitest::Test
                           'test/testcases/span/math/ritex.text', # bc of tidy
                           'test/testcases/block/15_math/itex2mml.text', # bc of tidy
                           'test/testcases/span/math/itex2mml.text', # bc of tidy
+                          'test/testcases/span/01_link/link_defs_with_ial.text', # bc of attribute ordering
                          ].compact
     Dir[File.dirname(__FILE__) + '/testcases/**/*.text'].each do |text_file|
       next if EXCLUDE_TEXT_FILES.any? {|f| text_file =~ /#{f}$/}
+      html_file = text_file.sub(/\.text$/, '.html')
+      html_file += '.19' if RUBY_VERSION >= '1.9' && File.exist?(html_file + '.19')
+      next unless File.exist?(html_file)
       define_method('test_' + text_file.tr('.', '_') + "_to_kramdown_to_html") do
-        html_file = text_file.sub(/\.text$/, '.html')
-        html_file += '.19' if RUBY_VERSION >= '1.9' && File.exist?(html_file + '.19')
         opts_file = text_file.sub(/\.text$/, '.options')
         opts_file = File.join(File.dirname(text_file), 'options') if !File.exist?(opts_file)
         options = File.exist?(opts_file) ? YAML::load(File.read(opts_file)) : {:auto_ids => false, :footnote_nr => 1}
@@ -177,7 +196,10 @@ class TestFiles < Minitest::Test
                              'test/testcases/span/math/ritex.html', # bc of tidy
                              'test/testcases/block/15_math/itex2mml.html', # bc of tidy
                              'test/testcases/span/math/itex2mml.html', # bc of tidy
-                            ]
+                             'test/testcases/block/15_math/mathjax_preview.html', # bc of mathjax preview
+                             'test/testcases/block/15_math/mathjax_preview_simple.html', # bc of mathjax preview
+                             'test/testcases/span/01_link/link_defs_with_ial.html', # bc of attribute ordering
+                            ].compact
     Dir[File.dirname(__FILE__) + '/testcases/**/*.{html,html.19}'].each do |html_file|
       next if EXCLUDE_HTML_KD_FILES.any? {|f| html_file =~ /#{f}(\.19)?$/}
       next if (RUBY_VERSION >= '1.9' && File.exist?(html_file + '.19')) ||
@@ -251,7 +273,7 @@ class TestFiles < Minitest::Test
                        'test/testcases/span/text_substitutions/typography.text',
                        ('test/testcases/span/03_codespan/highlighting-rouge.text' if RUBY_VERSION < '2.0'),
                        ('test/testcases/block/06_codeblock/highlighting-rouge.text' if RUBY_VERSION < '2.0'), #bc of rouge
-                      ]
+                      ].compact
 
   # Generate test methods for gfm-to-html conversion
   Dir[File.dirname(__FILE__) + '/{testcases,testcases_gfm}/**/*.text'].each do |text_file|
@@ -261,6 +283,7 @@ class TestFiles < Minitest::Test
     html_file = [(".html.19" if RUBY_VERSION >= '1.9'), ".html"].compact.
       map {|ext| basename + ext }.
       detect {|file| File.exist?(file) }
+    next unless html_file
 
     define_method('test_gfm_' + text_file.tr('.', '_') + "_to_html") do
       opts_file = basename + '.options'
@@ -272,12 +295,20 @@ class TestFiles < Minitest::Test
   end
 
 
+  EXCLUDE_PDF_MODIFY = ['test/testcases/span/text_substitutions/entities.text',
+                        'test/testcases/span/text_substitutions/entities_numeric.text',
+                        'test/testcases/span/text_substitutions/entities_as_char.text',
+                        'test/testcases/span/text_substitutions/entities_as_input.text',
+                        'test/testcases/span/text_substitutions/entities_symbolic.text',
+                        'test/testcases/block/04_header/with_auto_ids.text',
+                       ].compact
+
   # Generate test methods for asserting that converters don't modify the document tree.
   Dir[File.dirname(__FILE__) + '/testcases/**/*.text'].each do |text_file|
     opts_file = text_file.sub(/\.text$/, '.options')
     options = File.exist?(opts_file) ? YAML::load(File.read(opts_file)) : {:auto_ids => false, :footnote_nr => 1}
     (Kramdown::Converter.constants.map {|c| c.to_sym} - [:Base, :RemoveHtmlTags, :MathEngine, :SyntaxHighlighter]).each do |conv_class|
-      next if conv_class == :Pdf && RUBY_VERSION < '1.9'
+      next if conv_class == :Pdf && (RUBY_VERSION < '2.0' || EXCLUDE_PDF_MODIFY.any? {|f| text_file =~ /#{f}$/})
       define_method("test_whether_#{conv_class}_modifies_tree_with_file_#{text_file.tr('.', '_')}") do
         doc = Kramdown::Document.new(File.read(text_file), options)
         options_before = Marshal.load(Marshal.dump(doc.options))

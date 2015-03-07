@@ -10,12 +10,14 @@ describe "kramdown-to-xxx conversion" do
     'test/testcases/block/15_math/itex2mml.text',                 # bc no math support yet
     'test/testcases/block/15_math/normal.text',                   # bc no math support yet
     'test/testcases/block/15_math/ritex.text',                    # bc no math support yet
+    'test/testcases/block/15_math/mathjax_preview.text',          # bc no math support yet
+    'test/testcases/block/15_math/mathjax_preview_simple.text',   # bc no math support yet
     'test/testcases/span/math/itex2mml.text',                     # bc no math support yet
     'test/testcases/span/math/normal.text',                       # bc no math support yet
     'test/testcases/span/math/ritex.text',                        # bc no math support yet
     'test/testcases/span/03_codespan/highlighting-rouge.text',    # bc no highlight support yet
     'test/testcases/span/03_codespan/highlighting.text',          # bc no highlight support yet
-  ]
+  ].compact
 
   Dir["#{focus_files(testcase_dir)}.text"].each do |text_file|
     next if EXCLUDE_FILES.any? {|f| text_file =~ /#{f}$/}
