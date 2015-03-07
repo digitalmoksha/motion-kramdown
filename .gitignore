@@ -1,0 +1,8 @@
+htmldoc
+pkg
+webgen-tmp
+build
+.repl_history
+debugger_cmds
+Gemfile.lock
+vendor
