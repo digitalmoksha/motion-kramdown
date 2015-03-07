@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2014 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
@@ -9,6 +9,7 @@
 
 # RM require 'strscan'
 # RM require 'stringio'
+# RM require 'kramdown/parser'
 
 #TODO: use [[:alpha:]] in all regexp to allow parsing of international values in 1.9.1
 #NOTE: use @src.pre_match only before other check/match?/... operations, otherwise the content is changed
@@ -66,7 +67,6 @@ module Kramdown
 
         reset_env
 
-        @root.options[:abbrev_defs] = {}
         @alds = {}
         @footnotes = {}
         @link_defs = {}
@@ -88,6 +88,7 @@ module Kramdown
         configure_parser
         parse_blocks(@root, adapt_source(source))
         update_tree(@root)
+        correct_abbreviations_attributes
         replace_abbreviations(@root)
         @footnotes.each {|name,data| update_tree(data[:content])}
       end
@@ -134,7 +135,6 @@ module Kramdown
 
         status = catch(:stop_block_parsing) do
           while !@src.eos?
-            block_ial_set = @block_ial
             @block_parsers.any? do |name|
               if @src.check(@parsers[name].start_re)
                 send(@parsers[name].method)
@@ -145,7 +145,6 @@ module Kramdown
               warning('Warning: this should not occur - no block parser handled the line')
               add_text(@src.scan(/.*\n/))
             end
-            @block_ial = nil if block_ial_set
           end
         end
 
@@ -165,6 +164,7 @@ module Kramdown
             parse_spans(child)
             child.children
           elsif child.type == :eob
+            update_attr_with_ial(child.attr, child.options[:ial]) if child.options[:ial]
             []
           elsif child.type == :blank
             if last_blank
@@ -290,7 +290,10 @@ module Kramdown
       # exists. This method should always be used for creating a block-level element!
       def new_block_el(*args)
         el = Element.new(*args)
-        el.options[:ial] = @block_ial if @block_ial && el.type != :blank && el.type != :eob
+        if @block_ial
+          el.options[:ial] = @block_ial
+          @block_ial = nil
+        end
         el
       end
 

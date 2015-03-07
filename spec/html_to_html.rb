@@ -1,8 +1,8 @@
-describe "html-to-html conversion" do
+describe "html-to-{html,kramdown} conversion" do
 
   `tidy -v 2>&1`
   if $?.exitstatus != 0
-    warn("Skipping html-to-html tests because tidy executable is missing")
+    warn("Skipping html-to-{html,kramdown} tests because tidy executable is missing")
   else
     EXCLUDE_HTML_FILES = [
       'test/testcases/block/06_codeblock/whitespace.html',          # bc of span inside pre
@@ -16,23 +16,41 @@ describe "html-to-html conversion" do
       'test/testcases/span/math/ritex.html',                        # bc of tidy
       'test/testcases/block/15_math/itex2mml.html',                 # bc of tidy
       'test/testcases/span/math/itex2mml.html',                     # bc of tidy
-
+      'test/testcases/block/15_math/mathjax_preview.html',          # bc of mathjax preview
+      'test/testcases/block/15_math/mathjax_preview_simple.html',   # bc of mathjax preview
+                                
       'test/testcases/block/15_math/gh_128.html',                   # bc no math support yet
       'test/testcases/block/15_math/normal.html',                   # bc no math support yet
       'test/testcases/span/math/normal.html',                       # bc no math support yet
-    ]
+    ].compact
+
+    EXCLUDE_HTML_TEXT_FILES = ['test/testcases/block/09_html/parse_as_span.htmlinput',
+                               'test/testcases/block/09_html/parse_as_raw.htmlinput',
+                              ].compact
 
     Dir["#{focus_files(testcase_dir)}.{html,html.19,htmlinput,htmlinput.19}"].each do |html_file|
       next if EXCLUDE_HTML_FILES.any? {|f| html_file =~ /#{f}(\.19)?$/}
       next if skip_file_ruby_19?(html_file)
 
-      out_file  = (html_file =~ /\.htmlinput(\.19)?$/ ? html_file.sub(/input(\.19)?$/, '') : html_file)
       opts_file = html_file.sub(/\.html(input)?(\.19)?$/, '.options')
+
+      out_files = []
+      out_files << [(html_file =~ /\.htmlinput(\.19)?$/ ? html_file.sub(/input(\.19)?$/, '') : html_file), :to_html]
+      if html_file =~ /\.htmlinput(\.19)?$/ && !EXCLUDE_HTML_TEXT_FILES.any? {|f| html_file =~ /#{f}/}
+        out_files << [html_file.sub(/htmlinput(\.19)?$/, 'text'), :to_kramdown]
+      end
+
+      out_files.select {|f, _| File.exist?(f)}.each do |out_file, out_method|
       
-      it "#{short_name(html_file)} --> html" do
-        options   = load_options(opts_file)
-        doc       = Kramdown::Document.new(File.read(html_file), options.merge(:input => 'html'))
-        expect(tidy_output(File.read(out_file))).to eq tidy_output(doc.to_html)
+        it "#{short_name(html_file)} --> #{File.extname(out_file)}" do
+          options   = load_options(opts_file)
+          doc       = Kramdown::Document.new(File.read(html_file), options.merge(:input => 'html'))
+          if out_method == :to_html
+            expect(tidy_output(File.read(out_file))).to eq tidy_output(doc.send(out_method))
+          else
+            expect(File.read(out_file)).to eq doc.send(out_method)
+          end
+        end
       end
     end
   end

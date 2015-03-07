@@ -24,12 +24,15 @@ describe "text-to-kramdown-to-html conversion" do
       'test/testcases/span/math/ritex.text',                            # bc of tidy
       'test/testcases/block/15_math/itex2mml.text',                     # bc of tidy
       'test/testcases/span/math/itex2mml.text',                         # bc of tidy
+      'test/testcases/span/01_link/link_defs_with_ial.text',            # bc of attribute ordering
 
       'test/testcases/block/04_header/with_auto_ids.text',              # bc no transliteration support yet
       'test/testcases/block/06_codeblock/highlighting-opts.text',       # bc no highlight support yet
       'test/testcases/block/06_codeblock/highlighting.text',            # bc no highlight support yet
       'test/testcases/block/15_math/gh_128.text',                       # bc no math support yet
       'test/testcases/block/15_math/normal.text',                       # bc no math support yet
+      'test/testcases/block/15_math/mathjax_preview.text',              # bc no math support yet
+      'test/testcases/block/15_math/mathjax_preview_simple.text',       # bc no math support yet
       'test/testcases/span/03_codespan/highlighting.text',              # bc no highlight support yet
       'test/testcases/span/math/normal.text',                           # bc no math support yet
 
@@ -39,6 +42,7 @@ describe "text-to-kramdown-to-html conversion" do
       next if EXCLUDE_TEXT_FILES.any? {|f| text_file =~ /#{f}$/}
       html_file  = text_file.sub(/\.text$/, '.html')
       html_file += '.19' if RUBY_VERSION >= '1.9' && File.exist?(html_file + '.19')
+      next unless File.exist?(html_file)
       opts_file = text_file.sub(/\.text$/, '.options')
 
       it "#{short_name(text_file)} --> kramdown --> html" do

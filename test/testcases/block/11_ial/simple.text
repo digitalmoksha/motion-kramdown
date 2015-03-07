@@ -1,5 +1,5 @@
 Some paragraph.
-{:.class id key="val"}
+{:.class .-class id key="val"}
 
 Some paragraph.
 {:.cls1#id.cls2}
@@ -20,6 +20,10 @@ Some paragraph.
 {:#myid}
 
 {:.cls}
+Some paragraph here
+
+{:.cls1}
+{:.cls2}
 Some paragraph here
 
 Paragraph

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2014 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
@@ -23,7 +23,10 @@ module Kramdown
       TRAILING_WHITESPACE = /[ \t]*\n/
 
       def handle_kramdown_html_tag(el, closed, handle_body)
-        el.options[:ial] = @block_ial if @block_ial
+        if @block_ial
+          el.options[:ial] = @block_ial
+          @block_ial = nil
+        end
 
         content_model = if @tree.type != :html_element || @tree.options[:content_model] != :raw
                           (@options[:parse_block_html] ? HTML_CONTENT_MODEL[el.value] : :raw)
@@ -117,8 +120,8 @@ module Kramdown
             return
           end
 
-          attrs = Utils::OrderedHash.new
-          @src[2].scan(HTML_ATTRIBUTE_RE).each {|name,sep,val| attrs[name.downcase] = (val || '').gsub(/\n+/, ' ')}
+          attrs = parse_html_attributes(@src[2], line)
+          attrs.each {|name, value| value.gsub!(/\n+/, ' ')}
 
           do_parsing = (HTML_CONTENT_MODEL[tag_name] == :raw || @tree.options[:content_model] == :raw ? false : @options[:parse_span_html])
           if val = HTML_MARKDOWN_ATTR_MAP[attrs.delete('markdown')]

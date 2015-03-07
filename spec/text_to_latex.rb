@@ -10,7 +10,7 @@
 #       'test/testcases/span/01_link/image_in_a.text', # bc of image link
 #       'test/testcases/span/01_link/imagelinks.text', # bc of image links
 #       'test/testcases/span/04_footnote/markers.text', # bc of footnote in header
-#     ]
+#     ].compact
 #
 #     Dir["#{focus_files(testcase_dir)}.text"].each do |text_file|
 #       next if EXCLUDE_LATEX_FILES.any? {|f| text_file =~ /#{f}$/}

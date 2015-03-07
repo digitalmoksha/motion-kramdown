@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2014 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
@@ -418,7 +418,8 @@ specified levels are used for the table of contents.
 Default: 1..6
 Used by: HTML/Latex converter
 EOF
-      if String === val
+      case val
+      when String
         if val =~ /^(\d)\.\.(\d)$/
           val = Range.new($1.to_i, $2.to_i).to_a
         elsif val =~ /^\d(?:,\d)*$/
@@ -426,7 +427,7 @@ EOF
         else
           raise Kramdown::Error, "Invalid syntax for option toc_levels"
         end
-      elsif Array === val
+      when Array, Range
         val = val.map {|s| s.to_i}.uniq
       else
         raise Kramdown::Error, "Invalid type #{val.class} for option toc_levels"

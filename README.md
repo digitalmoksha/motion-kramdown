@@ -1,21 +1,23 @@
 # motion-kramdown
 
-This is a light modification of the [kramdown](https://github.com/gettalong/kramdown) Markdown parser, for use with RubyMotion on iOS and OS X.
+[![Gem Version](https://badge.fury.io/rb/motion-kramdown.svg)](http://badge.fury.io/rb/motion-kramdown)
 
-Currently implements: _kramdown_ 1.5
+[kramdown](https://github.com/gettalong/kramdown) Markdown parser, for use with RubyMotion on iOS and OS X.
+
+Currently implements: _kramdown_ 1.6
 
 ## Introduction
 
-_kramdown_ is yet-another-markdown-parser but fast, pure Ruby, using a strict syntax definition and supporting several common extensions.
+_kramdown_ is a fast, pure Ruby Markdown superset converter, using a strict syntax definition and supporting several common extensions.
 
-The syntax definition for the kramdown syntax can be found in **doc/syntax.page** (or online at <http://kramdown.gettalong.org/syntax.html>) and a quick reference is available in **doc/quickref.page** or online at <http://kramdown.gettalong.org/quickref.html>.
+The syntax definition for the kramdown syntax can be found online at <http://kramdown.gettalong.org/syntax.html> and a quick reference is available online at <http://kramdown.gettalong.org/quickref.html>.
 
-The _kramdown_ library is mainly written to support the kramdown-to-HTML conversion chain. However, due to its flexibility it supports other input and output formats as well. Here is a list of the supported formats:
+The _kramdown_ library is mainly written to support the kramdown-to-HTML conversion chain. However, due to its flexibility (by creating an internal AST) it supports other input and output formats as well. Here is a list of the supported formats:
 
-* input formats: kramdown (a Markdown superset), Markdown, HTML
+* input formats: kramdown (a Markdown superset), Markdown, GFM, HTML
 * output formats: HTML, kramdown (and LaTeX and PDF, though not in _motion-kramdown_)
 
-All the documentation on the available input and output formats is available in the **doc/** directory and online at <http://kramdown.gettalong.org>.
+All the documentation on the available input and output formats is available online at <http://kramdown.gettalong.org>.
 
 ## Installation
 

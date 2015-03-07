@@ -7,7 +7,7 @@ Gem::Specification.new do |gem|
   gem.authors       = ['Brett Walker', 'Thomas Leitner']
   gem.email         = ['github@digitalmoksha.com', 't_leitner@gmx.at']
   gem.summary       = "RubyMotion version of kramdown parser for Markdown"
-  gem.description   = "A light modification of the kramdown Markdown gem, for use with RubyMotion on iOS and OS X."
+  gem.description   = "The kramdown parser for Markdown, for use with RubyMotion on iOS and OS X."
   gem.homepage      = 'https://github.com/digitalmoksha/motion-kramdown'
   gem.licenses      = ['MIT']
   

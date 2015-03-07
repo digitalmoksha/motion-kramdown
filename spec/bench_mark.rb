@@ -4,7 +4,7 @@ FLAGS = HOEDOWN_EXT_TABLES | HOEDOWN_EXT_FENCED_CODE | HOEDOWN_EXT_FOOTNOTES |
         HOEDOWN_EXT_AUTOLINK | HOEDOWN_EXT_STRIKETHROUGH | HOEDOWN_EXT_HIGHLIGHT |
         HOEDOWN_EXT_SUPERSCRIPT | HOEDOWN_EXT_MATH | HOEDOWN_EXT_NO_INTRA_EMPHASIS
 
-runs          = 5
+runs          = 10
 files         = ['mdsyntax.text', 'mdbasics.text']
 benchmark_dir = File.join(File.dirname(__FILE__), '../benchmark')
 

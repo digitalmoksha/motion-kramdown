@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2014 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
@@ -18,7 +18,7 @@ module Kramdown
     class Kramdown
 
       LAZY_END_HTML_SPAN_ELEMENTS = Kramdown::Parser::Html::HTML_SPAN_ELEMENTS + %w{script}  # RM
-      LAZY_END_HTML_START = /<(?>(?!(?:#{LAZY_END_HTML_SPAN_ELEMENTS.join('|')})\b)#{REXML::Parsers::BaseParser::UNAME_STR})\s*(?>\s+#{REXML::Parsers::BaseParser::UNAME_STR}\s*=\s*(["']).*?\1)*\s*\/?>/m
+      LAZY_END_HTML_START = /<(?>(?!(?:#{LAZY_END_HTML_SPAN_ELEMENTS.join('|')})\b)#{REXML::Parsers::BaseParser::UNAME_STR})/
       LAZY_END_HTML_STOP = /<\/(?!(?:#{LAZY_END_HTML_SPAN_ELEMENTS.join('|')})\b)#{REXML::Parsers::BaseParser::UNAME_STR}\s*>/m
 
       OPT_SPACE_LAZY_END_HTML_START = /^#{OPT_SPACE}#{LAZY_END_HTML_START}/m  # RM Oniguruma -> ICU
@@ -37,7 +37,7 @@ module Kramdown
         while !@src.match?(self.class::PARAGRAPH_END)
           result << @src.scan(PARAGRAPH_MATCH)
         end
-        result.chomp!
+        result.rstrip!
         if @tree.children.last && @tree.children.last.type == :p
           @tree.children.last.children.first.value << "\n" << result
         else
