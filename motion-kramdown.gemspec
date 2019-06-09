@@ -10,7 +10,7 @@ Gem::Specification.new do |gem|
   gem.description   = "The kramdown parser for Markdown, for use with RubyMotion on iOS and OS X."
   gem.homepage      = 'https://github.com/digitalmoksha/motion-kramdown'
   gem.licenses      = ['MIT']
-  
+
   gem.files         = Dir.glob('lib/**/*.rb')
   gem.files        << 'README.md'
   gem.test_files    = Dir.glob('spec/**/*.rb')
@@ -20,4 +20,5 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'motion-strscan', '~> 0.5'
   gem.add_dependency 'motion-yaml', '~> 1.4'
 
+  gem.add_development_dependency 'bacon-expect', '~> 1.0' # required for Travis build to work
 end

@@ -4,7 +4,6 @@
 #   rake spec files=foo_spec filter="name of spec"
 #   rake spec filter_context="this doesn't work yet"  # To filter by context name (doesn't work until MacBacon implements it)
 #   rake spec hide_backtraces=yes                     # Hide backtraces
-#   rake spec focus=block/03_paragraph                # Focus on only certain testcase files
 
 
 # From http://chen.do/blog/2013/06/03/running-individual-specs-with-rubymotion/
@@ -33,5 +32,17 @@ silence_warnings do
     end
 
     Backtraces = false if ENV['hide_backtraces']
+  end
+end
+
+#------------------------------------------------------------------------------
+# TODO total hack - without this, the `bacon-expect` gem doesn't get used, and
+# On iOS I get errors like
+# *** Terminating app due to uncaught exception 'NameError', reason: '.../bacon-expect/lib/bacon-expect/matchers/eql.rb:2:in `<main>: uninitialized constant BaconExpect::Matcher::SingleMethod (NameError)
+# and on macOS it only show up as `*nil description*`
+module BaconExpect
+  module Matcher
+    class SingleMethod
+    end
   end
 end
