@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 def testcase_dir(dir = 'testcases')
-  File.join(File.dirname(__FILE__), '../../test', dir)
+  File.join(File.dirname(__FILE__), '../../../test', dir)
 end
 
 #------------------------------------------------------------------------------
@@ -18,7 +18,7 @@ def load_options(opts_file)
   options.tap do |o|
     o.keys.each { |k| o[(k.to_s[0] == ':' ? k[1..-1] : k).to_sym] = o.delete(k) }
   end
-  
+
   # YAML isn't hanldling integers correctly, is giving doubles instead
   options[:header_offset] = options[:header_offset].to_int  if options[:header_offset]
   options[:footnote_nr]   = options[:footnote_nr].to_int    if options[:footnote_nr]
