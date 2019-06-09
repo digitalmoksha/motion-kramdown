@@ -6,7 +6,6 @@ testing  = true if ARGV.join(' ') =~ /spec/
 require "motion/project/template/#{platform}"
 require 'rubygems'
 require 'motion-benchmark'
-require 'motion-cocoapods'
 
 begin
   require 'bundler'
@@ -19,11 +18,6 @@ require 'bacon-expect' if testing
 Motion::Project::App.setup do |app|
   app.name        = 'MotionKramdown'
   app.identifier  = 'com.digitalmoksha.MotionKramdown'
-
-  # for benchmarking
-  app.pods do
-    pod 'HoedownObjC'
-  end
 
   DBT.analyze(app)
 end
