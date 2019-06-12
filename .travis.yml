@@ -1,7 +1,6 @@
 os: osx
 osx_image: xcode10.2
 language: objective-c
-rvm: 2.4.2  # pre-installed in image
 env:
   - TMP_DIR=./tmp  # For motion repo, so it doesn't attempt to use /tmp, to which it has no access
 cache:
@@ -10,7 +9,7 @@ cache:
 
 before_install:
   - (ruby --version)
-  - wget https://s3.us-east-2.amazonaws.com/s3.rubymotion.com/RubyMotion-TravisCI.pkg
+  - wget http://travisci.rubymotion.com/
   - sudo installer -pkg RubyMotion-TravisCI.pkg -target /
   - cp -r /usr/lib/swift/*.dylib /Applications/Xcode.app/Contents/Frameworks/
   - touch /Applications/Xcode.app/Contents/Frameworks/.swift-5-staged
