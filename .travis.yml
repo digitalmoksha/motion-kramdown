@@ -15,6 +15,9 @@ before_install:
   - touch /Applications/Xcode.app/Contents/Frameworks/.swift-5-staged
   - eval "sudo motion activate $RUBYMOTION_LICENSE"
   - sudo motion update && motion repo
+  - sudo chown -R travis ~/Library/RubyMotion
+  - sudo mkdir -p ~/Library/RubyMotion/build
+  - sudo chown -R travis ~/Library/RubyMotion/build
 
 gemfile:
   - Gemfile
