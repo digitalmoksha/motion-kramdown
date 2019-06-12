@@ -9,7 +9,7 @@ cache:
 
 before_install:
   - (ruby --version)
-  - wget http://travisci.rubymotion.com/
+  - wget -O RubyMotion-TravisCI.pkg http://travisci.rubymotion.com/
   - sudo installer -pkg RubyMotion-TravisCI.pkg -target /
   - cp -r /usr/lib/swift/*.dylib /Applications/Xcode.app/Contents/Frameworks/
   - touch /Applications/Xcode.app/Contents/Frameworks/.swift-5-staged
