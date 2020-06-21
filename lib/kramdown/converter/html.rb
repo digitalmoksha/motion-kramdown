@@ -330,7 +330,7 @@ module Kramdown
       def convert_root(el, indent)
         result = inner(el, indent)
         if @footnote_location
-          result.sub!(/#{@footnote_location}/, footnote_content)
+          result.sub!(/#{@footnote_location}/, footnote_content.gsub(/\\/, "\\\\\\\\"))
         else
           result << footnote_content
         end
@@ -341,7 +341,7 @@ module Kramdown
                  else
                    ''
                  end
-          result.sub!(/#{@toc_code.last}/, text)
+                 result.sub!(/#{@toc_code.last}/, text.gsub(/\\/, "\\\\\\\\"))
         end
         result
       end
@@ -430,14 +430,15 @@ module Kramdown
         ol = Element.new(:ol)
         ol.attr['start'] = @footnote_start if @footnote_start != 1
         i = 0
+        backlink_text = escape_html(@options[:footnote_backlink], :text)
         while i < @footnotes.length
           name, data, _, repeat = *@footnotes[i]
           li = Element.new(:li, nil, {'id' => "fn:#{name}"})
           li.children = Marshal.load(Marshal.dump(data.children))
-          
+
           #------------------------------------------------------------------------------
           # RM Crash due to an object being autoreleased one too many times in RubyMotion.
-          # pre-initializing `para` before it's assigned in the `if` statement seems to 
+          # pre-initializing `para` before it's assigned in the `if` statement seems to
           # fix it.
           para = nil
 
@@ -449,9 +450,9 @@ module Kramdown
             insert_space = false
           end
 
-          para.children << Element.new(:raw, FOOTNOTE_BACKLINK_FMT % [insert_space ? ' ' : '', name, "&#8617;"])
+          para.children << Element.new(:raw, FOOTNOTE_BACKLINK_FMT % [insert_space ? ' ' : '', name, backlink_text])
           (1..repeat).each do |index|
-            para.children << Element.new(:raw, FOOTNOTE_BACKLINK_FMT % [" ", "#{name}:#{index}", "&#8617;<sup>#{index+1}</sup>"])
+            para.children << Element.new(:raw, FOOTNOTE_BACKLINK_FMT % [" ", "#{name}:#{index}", "#{backlink_text}<sup>#{index+1}</sup>"])
           end
 
           ol.children << Element.new(:raw, convert(li, 4))

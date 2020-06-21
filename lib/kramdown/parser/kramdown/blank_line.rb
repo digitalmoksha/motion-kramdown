@@ -11,7 +11,7 @@ module Kramdown
   module Parser
     class Kramdown
 
-      BLANK_LINE = /(?:^\s*\n)+/m     # RM Oniguruma -> ICU
+      BLANK_LINE = /(?>^\s*\n)+/m     # RM Oniguruma -> ICU
 
       # Parse the blank line at the current postition.
       def parse_blank_line
