@@ -24,6 +24,7 @@ describe "html-to-kramdown-to-html conversion" do
       'test/testcases/span/math/ritex.html',                            # bc of tidy
       'test/testcases/block/15_math/itex2mml.html',                     # bc of tidy
       'test/testcases/span/math/itex2mml.html',                         # bc of tidy
+      'test/testcases/span/math/mathjaxnode.html',                      # bc of tidy
       'test/testcases/block/15_math/mathjax_preview.html',              # bc of mathjax preview
       'test/testcases/block/15_math/mathjax_preview_simple.html',       # bc of mathjax preview
       'test/testcases/span/01_link/link_defs_with_ial.html',            # bc of attribute ordering

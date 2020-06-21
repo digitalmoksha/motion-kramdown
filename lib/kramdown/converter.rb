@@ -31,12 +31,12 @@ module Kramdown
 
     configurable(:syntax_highlighter)
 
-    # RM ["Coderay", "Rouge"].each do |klass_name|
+    # RM ["Minted", "Coderay", "Rouge"].each do |klass_name|
     # RM   kn_down = klass_name.downcase.intern
     # RM   add_syntax_highlighter(kn_down) do |converter, text, lang, type, opts|
     # RM     require "kramdown/converter/syntax_highlighter/#{kn_down}"
     # RM     klass = ::Kramdown::Utils.deep_const_get("::Kramdown::Converter::SyntaxHighlighter::#{klass_name}")
-    # RM     if klass::AVAILABLE
+    # RM.    if !klass.const_defined?(:AVAILABLE) || klass::AVAILABLE
     # RM       add_syntax_highlighter(kn_down, klass)
     # RM     else
     # RM       add_syntax_highlighter(kn_down) {|*args| nil}
@@ -44,18 +44,15 @@ module Kramdown
     # RM     syntax_highlighter(kn_down).call(converter, text, lang, type, opts)
     # RM   end
     # RM end
-    # RM 
+    # RM
     # RM configurable(:math_engine)
-    # RM 
-    # RM require 'kramdown/converter/math_engine/mathjax'
-    # RM add_math_engine(:mathjax, ::Kramdown::Converter::MathEngine::Mathjax)
-    # RM 
-    # RM ["Ritex", "Itex2MML"].each do |klass_name|
+    # RM
+    # RM ["Mathjax", "MathjaxNode", "Ritex", "Itex2MML"].each do |klass_name|
     # RM   kn_down = klass_name.downcase.intern
     # RM   add_math_engine(kn_down) do |converter, el, opts|
     # RM     require "kramdown/converter/math_engine/#{kn_down}"
     # RM     klass = ::Kramdown::Utils.deep_const_get("::Kramdown::Converter::MathEngine::#{klass_name}")
-    # RM     if klass::AVAILABLE
+    # RM     if !klass.const_defined?(:AVAILABLE) || klass::AVAILABLE
     # RM       add_math_engine(kn_down, klass)
     # RM     else
     # RM       add_math_engine(kn_down) {|*args| nil}

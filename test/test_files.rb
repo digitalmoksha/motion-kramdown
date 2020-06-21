@@ -57,6 +57,10 @@ class TestFiles < Minitest::Test
                           'test/testcases/span/math/ritex.html', # bc of tidy
                           'test/testcases/block/15_math/itex2mml.html', # bc of tidy
                           'test/testcases/span/math/itex2mml.html', # bc of tidy
+                          'test/testcases/block/15_math/mathjaxnode.html', # bc of tidy
+                          'test/testcases/block/15_math/mathjaxnode_notexhints.html', # bc of tidy
+                          'test/testcases/block/15_math/mathjaxnode_semantics.html', # bc of tidy
+                          'test/testcases/span/math/mathjaxnode.html', # bc of tidy
                           'test/testcases/block/15_math/mathjax_preview.html', # bc of mathjax preview
                           'test/testcases/block/15_math/mathjax_preview_simple.html', # bc of mathjax preview
                          ].compact
@@ -111,6 +115,7 @@ class TestFiles < Minitest::Test
                            'test/testcases/span/01_link/imagelinks.text', # bc of image links
                            'test/testcases/span/01_link/empty_title.text',
                            'test/testcases/span/04_footnote/markers.text', # bc of footnote in header
+                           'test/testcases/block/06_codeblock/with_lang_in_fenced_block_name_with_dash.text',
                           ].compact
     Dir[File.dirname(__FILE__) + '/testcases/**/*.text'].each do |text_file|
       next if EXCLUDE_LATEX_FILES.any? {|f| text_file =~ /#{f}$/}
@@ -154,6 +159,10 @@ class TestFiles < Minitest::Test
                           'test/testcases/span/math/ritex.text', # bc of tidy
                           'test/testcases/block/15_math/itex2mml.text', # bc of tidy
                           'test/testcases/span/math/itex2mml.text', # bc of tidy
+                          'test/testcases/block/15_math/mathjaxnode.text', # bc of tidy
+                          'test/testcases/block/15_math/mathjaxnode_notexhints.text', # bc of tidy
+                          'test/testcases/block/15_math/mathjaxnode_semantics.text', # bc of tidy
+                          'test/testcases/span/math/mathjaxnode.text', # bc of tidy
                           'test/testcases/span/01_link/link_defs_with_ial.text', # bc of attribute ordering
                          ].compact
     Dir[File.dirname(__FILE__) + '/testcases/**/*.text'].each do |text_file|
@@ -196,6 +205,10 @@ class TestFiles < Minitest::Test
                              'test/testcases/span/math/ritex.html', # bc of tidy
                              'test/testcases/block/15_math/itex2mml.html', # bc of tidy
                              'test/testcases/span/math/itex2mml.html', # bc of tidy
+                             'test/testcases/block/15_math/mathjaxnode.html', # bc of tidy
+                             'test/testcases/block/15_math/mathjaxnode_notexhints.html', # bc of tidy
+                             'test/testcases/block/15_math/mathjaxnode_semantics.html', # bc of tidy
+                             'test/testcases/span/math/mathjaxnode.html', # bc of tidy
                              'test/testcases/block/15_math/mathjax_preview.html', # bc of mathjax preview
                              'test/testcases/block/15_math/mathjax_preview_simple.html', # bc of mathjax preview
                              'test/testcases/span/01_link/link_defs_with_ial.html', # bc of attribute ordering

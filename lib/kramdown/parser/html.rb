@@ -150,7 +150,7 @@ module Kramdown
               elsif result = @src.scan(HTML_INSTRUCTION_RE)
                 @tree.children << Element.new(:xml_pi, result, nil, :category => :block, :location => line)
               elsif @src.scan(HTML_TAG_RE)
-                if method(:handle_html_start_tag).arity == 1
+                if method(:handle_html_start_tag).arity.abs >= 1
                   handle_html_start_tag(line, &block)
                 else
                   handle_html_start_tag(&block) # DEPRECATED: method needs to accept line number in 2.0
@@ -422,7 +422,7 @@ module Kramdown
             else
               set_basics(el, :codeblock)
               if el.children.size == 1 && el.children.first.value == 'code'
-                value = (el.children.first.attr['class'] || '').scan(/\blanguage-\w+\b/).first
+                value = (el.children.first.attr['class'] || '').scan(/\blanguage-\w[\w-]*\b/).first
                 el.attr['class'] = "#{value} #{el.attr['class']}".rstrip if value
               end
             end

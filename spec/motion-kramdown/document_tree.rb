@@ -15,6 +15,10 @@ describe "asserting that converters don't modify the document tree" do
     'test/testcases/block/15_math/ritex.text',                        # bc no math support yet
     'test/testcases/block/15_math/mathjax_preview.text',              # bc no math support yet
     'test/testcases/block/15_math/mathjax_preview_simple.text',       # bc no math support yet
+    'test/testcases/block/15_math/mathjaxnode_notexhints.text',       # bc no math support yet
+    'test/testcases/block/15_math/mathjaxnode_semantics.text',        # bc no math support yet
+    'test/testcases/block/15_math/mathjaxnode.text',                  # bc no math support yet
+    'test/testcases/span/math/mathjaxnode.text',                      # bc no math support yet
     'test/testcases/span/math/normal.text',                           # bc no math support yet
     'test/testcases/span/math/ritex.text',                            # bc no math support yet
     'test/testcases/span/math/itex2mml.text',                         # bc no math support yet
@@ -24,7 +28,7 @@ describe "asserting that converters don't modify the document tree" do
     next if EXCLUDE_TREE_FILES.any? {|f| text_file =~ /#{f}$/}
     opts_file = text_file.sub(/\.text$/, '.options')
     options   = load_options(opts_file)
-    
+
     (Kramdown::Converter.constants(true).map {|c| c.to_sym} - [:Latex, :Base, :RemoveHtmlTags, :MathEngine, :SyntaxHighlighter]).each do |conv_class|
       next if conv_class == :Pdf && (RUBY_VERSION < '2.0' || EXCLUDE_PDF_MODIFY.any? {|f| text_file =~ /#{f}$/})
 

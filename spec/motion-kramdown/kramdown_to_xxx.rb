@@ -5,6 +5,8 @@ describe "kramdown-to-xxx conversion" do
     'test/testcases/block/06_codeblock/highlighting-opts.text',   # bc no highlight support yet
     'test/testcases/block/06_codeblock/highlighting-rouge.text',  # bc no highlight support yet
     'test/testcases/block/06_codeblock/highlighting.text',        # bc no highlight support yet
+    'test/testcases/block/06_codeblock/highlighting-minted.text', # bc no highlight support yet
+    'test/testcases/block/06_codeblock/highlighting-minted-with-opts.text', # bc no highlight support yet
     'test/testcases/block/12_extension/options3.text',            # bc no highlight support yet
     'test/testcases/block/15_math/gh_128.text',                   # bc no math support yet
     'test/testcases/block/15_math/itex2mml.text',                 # bc no math support yet
@@ -12,11 +14,17 @@ describe "kramdown-to-xxx conversion" do
     'test/testcases/block/15_math/ritex.text',                    # bc no math support yet
     'test/testcases/block/15_math/mathjax_preview.text',          # bc no math support yet
     'test/testcases/block/15_math/mathjax_preview_simple.text',   # bc no math support yet
+    'test/testcases/block/15_math/mathjaxnode_notexhints.text',       # bc no math support yet
+    'test/testcases/block/15_math/mathjaxnode_semantics.text',        # bc no math support yet
+    'test/testcases/block/15_math/mathjaxnode.text',                  # bc no math support yet
+
     'test/testcases/span/math/itex2mml.text',                     # bc no math support yet
+    'test/testcases/span/math/mathjaxnode.text',                  # bc no math support yet
     'test/testcases/span/math/normal.text',                       # bc no math support yet
     'test/testcases/span/math/ritex.text',                        # bc no math support yet
     'test/testcases/span/03_codespan/highlighting-rouge.text',    # bc no highlight support yet
     'test/testcases/span/03_codespan/highlighting.text',          # bc no highlight support yet
+    'test/testcases/span/03_codespan/highlighting-minted.text',   # bc no highlight support yet
   ].compact
 
   Dir["#{focus_files(testcase_dir)}.text"].each do |text_file|
@@ -37,6 +45,6 @@ describe "kramdown-to-xxx conversion" do
       end
     end
   end
-  
+
 end
 

@@ -37,6 +37,9 @@ describe "gfm-to-html conversion" do
    'test/testcases/block/14_table/escaping.text',
    'test/testcases/block/14_table/simple.text',
    'test/testcases/block/15_math/normal.text',
+   'test/testcases/block/15_math/mathjaxnode_notexhints.text',
+   'test/testcases/block/15_math/mathjaxnode_semantics.text',
+   'test/testcases/block/15_math/mathjaxnode.text',
    'test/testcases/encoding.text',
    'test/testcases/span/01_link/inline.text',
    'test/testcases/span/01_link/link_defs.text',
@@ -58,7 +61,7 @@ describe "gfm-to-html conversion" do
    'test/testcases/span/text_substitutions/typography.text',
    ('test/testcases/span/03_codespan/highlighting-rouge.text' if RUBY_VERSION < '2.0'),
    ('test/testcases/block/06_codeblock/highlighting-rouge.text' if RUBY_VERSION < '2.0'), #bc of rouge
-   
+
    'test/testcases/block/04_header/with_auto_ids.text',          # bc no transliteration support yet
    'test/testcases/block/06_codeblock/highlighting-opts.text',   # bc no highlight support yet
    'test/testcases/block/06_codeblock/highlighting.text',        # bc no highlight support yet
@@ -70,6 +73,7 @@ describe "gfm-to-html conversion" do
    'test/testcases/block/15_math/mathjax_preview.text',          # bc no math support yet
    'test/testcases/block/15_math/mathjax_preview_simple.text',   # bc no math support yet
    'test/testcases/span/math/itex2mml.text',                     # bc no math support yet
+   'test/testcases/span/math/mathjaxnode.text',                  # bc no math support yet
    'test/testcases/span/math/normal.text',                       # bc no math support yet
    'test/testcases/span/math/ritex.text',                        # bc no math support yet
    'test/testcases/span/03_codespan/highlighting-rouge.text',    # bc no highlight support yet
