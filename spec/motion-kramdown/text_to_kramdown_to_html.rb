@@ -8,7 +8,7 @@ describe "text-to-kramdown-to-html conversion" do
       'test/testcases/block/04_header/header_type_offset.text',         # bc of header_offset being applied twice
       ('test/testcases/block/04_header/with_auto_ids.text' if RUBY_VERSION <= '1.8.6'), # bc of dep stringex not working
       'test/testcases/block/04_header/with_auto_ids.text',              # bc no transliteration support yet
-      ('test/testcases/block/06_codeblock/highlighting-rouge.text' if RUBY_VERSION < '2.0'), #bc of rouge
+      ('test/testcases/block/06_codeblock/rouge/highlighting-rouge.text' if RUBY_VERSION < '2.0'), #bc of rouge
       'test/testcases/block/06_codeblock/highlighting-opts.text',       # bc no highlight support yet
       'test/testcases/block/06_codeblock/highlighting.text',            # bc no highlight support yet
       'test/testcases/block/09_html/content_model/tables.text',         # bc of parse_block_html option
@@ -31,7 +31,7 @@ describe "text-to-kramdown-to-html conversion" do
 
       'test/testcases/span/01_link/link_defs_with_ial.text',            # bc of attribute ordering
       'test/testcases/span/03_codespan/highlighting.text',              # bc no highlight support yet
-      ('test/testcases/span/03_codespan/highlighting-rouge.text' if RUBY_VERSION < '2.0'),
+      ('test/testcases/span/03_codespan/rouge/highlighting-rouge.text' if RUBY_VERSION < '2.0'),
       'test/testcases/span/05_html/markdown_attr.text',                 # bc of markdown attr
       'test/testcases/span/extension/options.text',                     # bc of parse_span_html option
       'test/testcases/span/extension/comment.text',                     # bc of comment text modifications (can this be avoided?)

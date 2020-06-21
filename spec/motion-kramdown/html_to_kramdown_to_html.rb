@@ -12,14 +12,14 @@ describe "html-to-kramdown-to-html conversion" do
       'test/testcases/block/09_html/markdown_attr.html',                # bc of markdown attr
       'test/testcases/block/09_html/html_to_native/table_simple.html',  # bc of invalidly converted simple table
       'test/testcases/block/06_codeblock/whitespace.html',              # bc of entity to char conversion
-      'test/testcases/block/06_codeblock/highlighting-rouge.html',      # bc of double surrounding <div>
+      'test/testcases/block/06_codeblock/rouge/highlighting-rouge.html',      # bc of double surrounding <div>
       'test/testcases/block/11_ial/simple.html',                        # bc of change of ordering of attributes in header
       'test/testcases/span/03_codespan/highlighting.html',              # bc of span elements inside code element
       'test/testcases/block/04_header/with_auto_ids.html',              # bc of auto_ids=true option
       'test/testcases/block/04_header/header_type_offset.html',         # bc of header_offset option
       'test/testcases/block/16_toc/toc_exclude.html',                   # bc of different attribute ordering
       'test/testcases/span/autolinks/url_links.html',                   # bc of quot entity being converted to char
-      ('test/testcases/span/03_codespan/highlighting-rouge.html' if RUBY_VERSION < '2.0'),
+      ('test/testcases/span/03_codespan/rouge/highlighting-rouge.html' if RUBY_VERSION < '2.0'),
       'test/testcases/block/15_math/ritex.html',                        # bc of tidy
       'test/testcases/span/math/ritex.html',                            # bc of tidy
       'test/testcases/block/15_math/itex2mml.html',                     # bc of tidy

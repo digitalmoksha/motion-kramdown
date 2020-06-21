@@ -10,15 +10,15 @@ describe "html-to-{html,kramdown} conversion" do
       'test/testcases/span/03_codespan/highlighting.html',          # bc of span elements inside code element
       'test/testcases/block/04_header/with_auto_ids.html',          # bc of auto_ids=true option
       'test/testcases/block/04_header/header_type_offset.html',     # bc of header_offset option
-      'test/testcases/block/06_codeblock/highlighting-rouge.html',  # bc of double surrounding <div>
-      ('test/testcases/span/03_codespan/highlighting-rouge.html'    if RUBY_VERSION < '2.0'),
+      'test/testcases/block/06_codeblock/rouge/highlighting-rouge.html',  # bc of double surrounding <div>
+      ('test/testcases/span/03_codespan/rouge/highlighting-rouge.html'    if RUBY_VERSION < '2.0'),
       'test/testcases/block/15_math/ritex.html',                    # bc of tidy
       'test/testcases/span/math/ritex.html',                        # bc of tidy
       'test/testcases/block/15_math/itex2mml.html',                 # bc of tidy
       'test/testcases/span/math/itex2mml.html',                     # bc of tidy
       'test/testcases/block/15_math/mathjax_preview.html',          # bc of mathjax preview
       'test/testcases/block/15_math/mathjax_preview_simple.html',   # bc of mathjax preview
-                                
+
       'test/testcases/block/15_math/gh_128.html',                   # bc no math support yet
       'test/testcases/block/15_math/normal.html',                   # bc no math support yet
       'test/testcases/span/math/normal.html',                       # bc no math support yet
@@ -41,7 +41,7 @@ describe "html-to-{html,kramdown} conversion" do
       end
 
       out_files.select {|f, _| File.exist?(f)}.each do |out_file, out_method|
-      
+
         it "#{short_name(html_file)} --> #{File.extname(out_file)}" do
           options   = load_options(opts_file)
           doc       = Kramdown::Document.new(File.read(html_file), options.merge(:input => 'html'))
