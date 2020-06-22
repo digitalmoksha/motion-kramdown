@@ -9,6 +9,7 @@ describe "html-to-{html,kramdown} conversion" do
       'test/testcases/block/04_header/header_type_offset.html',     # bc of header_offset option
       'test/testcases/block/06_codeblock/whitespace.html',          # bc of span inside pre
       'test/testcases/block/06_codeblock/rouge/simple.html',        # bc of double surrounding <div>
+      'test/testcases/block/06_codeblock/rouge/multiple.html',      # bc of double surrounding <div>
       'test/testcases/block/09_html/simple.html',                   # bc of xml elements
       'test/testcases/block/09_html/xml.html',                      # bc of tidy
       'test/testcases/block/15_math/ritex.html',                    # bc of tidy

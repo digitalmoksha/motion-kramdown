@@ -9,6 +9,7 @@ describe "text-to-kramdown-to-html conversion" do
       ('test/testcases/block/04_header/with_auto_ids.text' if RUBY_VERSION <= '1.8.6'), # bc of dep stringex not working
       'test/testcases/block/04_header/with_auto_ids.text',              # bc no transliteration support yet
       ('test/testcases/block/06_codeblock/rouge/simple.text' if RUBY_VERSION < '2.0'), #bc of rouge
+      ('test/testcases/block/06_codeblock/rouge/multiple.text' if RUBY_VERSION < '2.0'), #bc of rouge
       'test/testcases/block/06_codeblock/highlighting-opts.text',       # bc no highlight support yet
       'test/testcases/block/06_codeblock/highlighting.text',            # bc no highlight support yet
       'test/testcases/block/09_html/content_model/tables.text',         # bc of parse_block_html option

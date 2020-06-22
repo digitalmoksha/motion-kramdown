@@ -12,6 +12,22 @@ require 'kramdown'
 require 'yaml'
 require 'tmpdir'
 
+begin
+  require 'kramdown/converter/syntax_highlighter/rouge'
+
+  # custom formatter for tests
+  class RougeHTMLFormatters < ::Rouge::Formatters::HTML
+    tag 'rouge_html_formatters'
+
+    def stream(tokens, &b)
+      yield %(<div class="custom-class">)
+      super
+      yield %(</div>)
+    end
+  end
+rescue LoadError, SyntaxError, NameError
+end
+
 Encoding.default_external = 'utf-8' if RUBY_VERSION >= '1.9'
 
 class TestFiles < Minitest::Test
@@ -19,7 +35,8 @@ class TestFiles < Minitest::Test
   EXCLUDE_KD_FILES = [('test/testcases/block/04_header/with_auto_ids.text' if RUBY_VERSION <= '1.8.6'), # bc of dep stringex not working
                       ('test/testcases/span/03_codespan/rouge/' if RUBY_VERSION < '2.0'), #bc of rouge
                       ('test/testcases/block/06_codeblock/rouge/' if RUBY_VERSION < '2.0'), #bc of rouge
-
+                      ('test/testcases/block/15_math/itex2mml.text' if RUBY_PLATFORM == 'java'), # bc of itextomml
+                      ('test/testcases/span/math/itex2mml.text' if RUBY_PLATFORM == 'java'), # bc of itextomml
                      ].compact
 
   # Generate test methods for kramdown-to-xxx conversion
@@ -52,6 +69,7 @@ class TestFiles < Minitest::Test
                           'test/testcases/block/04_header/with_auto_ids.html', # bc of auto_ids=true option
                           'test/testcases/block/04_header/header_type_offset.html', # bc of header_offset option
                           'test/testcases/block/06_codeblock/rouge/simple.html', # bc of double surrounding <div>
+                          'test/testcases/block/06_codeblock/rouge/multiple.html', # bc of double surrounding <div>
                           ('test/testcases/span/03_codespan/rouge/simple.html' if RUBY_VERSION < '2.0'),
                           ('test/testcases/span/03_codespan/rouge/disabled.html' if RUBY_VERSION < '2.0'),
                           'test/testcases/block/15_math/ritex.html', # bc of tidy
@@ -161,6 +179,7 @@ class TestFiles < Minitest::Test
                           ('test/testcases/span/03_codespan/rouge/simple.text' if RUBY_VERSION < '2.0'), #bc of rouge
                           ('test/testcases/span/03_codespan/rouge/disabled.text' if RUBY_VERSION < '2.0'), #bc of rouge
                           'test/testcases/block/06_codeblock/rouge/simple.text',
+                          'test/testcases/block/06_codeblock/rouge/multiple.text', # check, what document contain more, than one code block
                           'test/testcases/block/15_math/ritex.text', # bc of tidy
                           'test/testcases/span/math/ritex.text', # bc of tidy
                           'test/testcases/block/15_math/itex2mml.text', # bc of tidy
@@ -203,6 +222,7 @@ class TestFiles < Minitest::Test
                              'test/testcases/block/09_html/html_to_native/table_simple.html', # bc of invalidly converted simple table
                              'test/testcases/block/06_codeblock/whitespace.html', # bc of entity to char conversion
                              'test/testcases/block/06_codeblock/rouge/simple.html', # bc of double surrounding <div>
+                             'test/testcases/block/06_codeblock/rouge/multiple.html', # bc of double surrounding <div>
                              'test/testcases/block/11_ial/simple.html',           # bc of change of ordering of attributes in header
                              'test/testcases/span/03_codespan/highlighting.html', # bc of span elements inside code element
                              'test/testcases/block/04_header/with_auto_ids.html', # bc of auto_ids=true option
@@ -294,6 +314,7 @@ class TestFiles < Minitest::Test
                        'test/testcases/span/extension/comment.text',
                        'test/testcases/span/ial/simple.text',
                        'test/testcases/span/line_breaks/normal.text',
+                       'test/testcases/span/math/normal.text',
                        'test/testcases/span/text_substitutions/entities_as_char.text',
                        'test/testcases/span/text_substitutions/entities.text',
                        'test/testcases/span/text_substitutions/typography.text',
@@ -301,6 +322,9 @@ class TestFiles < Minitest::Test
                        ('test/testcases/span/03_codespan/rouge/disabled.text' if RUBY_VERSION < '2.0'),
                        ('test/testcases/block/06_codeblock/rouge/simple.text' if RUBY_VERSION < '2.0'), #bc of rouge
                        ('test/testcases/block/06_codeblock/rouge/disabled.text' if RUBY_VERSION < '2.0'), #bc of rouge
+                       ('test/testcases/block/06_codeblock/rouge/multiple.text' if RUBY_VERSION < '2.0'), #bc of rouge
+                       ('test/testcases/block/15_math/itex2mml.text' if RUBY_PLATFORM == 'java'), # bc of itextomml
+                       ('test/testcases/span/math/itex2mml.text' if RUBY_PLATFORM == 'java'), # bc of itextomml
                       ].compact
 
   # Generate test methods for gfm-to-html conversion
@@ -331,11 +355,15 @@ class TestFiles < Minitest::Test
                         'test/testcases/block/04_header/with_auto_ids.text',
                        ].compact
 
+  EXCLUDE_MODIFY = ['test/testcases/block/06_codeblock/rouge/multiple.text', # bc of HTMLFormater in options
+                   ]
+
   # Generate test methods for asserting that converters don't modify the document tree.
   Dir[File.dirname(__FILE__) + '/testcases/**/*.text'].each do |text_file|
     opts_file = text_file.sub(/\.text$/, '.options')
     options = File.exist?(opts_file) ? YAML::load(File.read(opts_file)) : {:auto_ids => false, :footnote_nr => 1}
     (Kramdown::Converter.constants.map {|c| c.to_sym} - [:Base, :RemoveHtmlTags, :MathEngine, :SyntaxHighlighter]).each do |conv_class|
+      next if EXCLUDE_MODIFY.any? {|f| text_file =~ /#{f}$/}
       next if conv_class == :Pdf && (RUBY_VERSION < '2.0' || EXCLUDE_PDF_MODIFY.any? {|f| text_file =~ /#{f}$/})
       define_method("test_whether_#{conv_class}_modifies_tree_with_file_#{text_file.tr('.', '_')}") do
         doc = Kramdown::Document.new(File.read(text_file), options)

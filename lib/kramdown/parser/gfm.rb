@@ -17,8 +17,16 @@ module Kramdown
       def initialize(source, options)
         super
         @span_parsers.delete(:line_break) if @options[:hard_wrap]
+        if @options[:gfm_quirks].include?(:paragraph_end)
+          atx_header_parser = :atx_header_gfm_quirk
+          @paragraph_end = self.class::PARAGRAPH_END_GFM
+        else
+          atx_header_parser = :atx_header_gfm
+          @paragraph_end = self.class::PARAGRAPH_END
+        end
+
         {:codeblock_fenced => :codeblock_fenced_gfm,
-          :atx_header => :atx_header_gfm}.each do |current, replacement|
+          :atx_header => atx_header_parser}.each do |current, replacement|
           i = @block_parsers.index(current)
           @block_parsers.delete(current)
           @block_parsers.insert(i, replacement)
@@ -60,9 +68,26 @@ module Kramdown
 
       ATX_HEADER_START = /^\#{1,6}\s/
       define_parser(:atx_header_gfm, ATX_HEADER_START, nil, 'parse_atx_header')
+      define_parser(:atx_header_gfm_quirk, ATX_HEADER_START)
 
+      # Copied from kramdown/parser/kramdown/header.rb, removed the first line
+      def parse_atx_header_gfm_quirk
+        start_line_number = @src.current_line_number
+        @src.check(ATX_HEADER_MATCH)
+        level, text, id = @src[1], @src[2].to_s.strip, @src[3]
+        return false if text.empty?
+
+        @src.pos += @src.matched_size
+        el = new_block_el(:header, nil, nil, :level => level.length, :raw_text => text, :location => start_line_number)
+        add_text(text, el)
+        el.attr['id'] = id if id
+        @tree.children << el
+        true
+      end
+
+      FENCED_CODEBLOCK_START = /^[~`]{3,}/
       FENCED_CODEBLOCK_MATCH = /^(([~`]){3,})\s*?((\S+?)(?:\?\S*)?)?\s*?\n(.*?)^\1\2*\s*?\n/m
-      define_parser(:codeblock_fenced_gfm, /^[~`]{3,}/, nil, 'parse_codeblock_fenced')
+      define_parser(:codeblock_fenced_gfm, FENCED_CODEBLOCK_START, nil, 'parse_codeblock_fenced')
 
       STRIKETHROUGH_DELIM = /~~/
       STRIKETHROUGH_MATCH = /#{STRIKETHROUGH_DELIM}[^\s~](.*?)[^\s~]#{STRIKETHROUGH_DELIM}/m
@@ -86,6 +111,12 @@ module Kramdown
 
       ESCAPED_CHARS_GFM = /\\([\\.*_+`<>()\[\]{}#!:\|"'\$=\-~])/
       define_parser(:escaped_chars_gfm, ESCAPED_CHARS_GFM, '\\\\', :parse_escaped_chars)
+
+      PARAGRAPH_END_GFM = /#{LAZY_END}|#{LIST_START}|#{ATX_HEADER_START}|#{DEFINITION_LIST_START}|#{BLOCKQUOTE_START}|#{FENCED_CODEBLOCK_START}/
+
+      def paragraph_end
+        @paragraph_end
+      end
 
     end
   end

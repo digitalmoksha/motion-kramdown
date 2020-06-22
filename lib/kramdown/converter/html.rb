@@ -165,7 +165,14 @@ module Kramdown
       alias :convert_dd :convert_li
 
       def convert_dt(el, indent)
-        format_as_block_html(el.type, el.attr, inner(el, indent), indent)
+        attr = el.attr.dup
+        @stack.last.options[:ial][:refs].each do |ref|
+          if ref =~ /\Aauto_ids(?:-([\w-]+))?/
+            attr['id'] = ($1 ? $1 : '') << basic_generate_id(el.options[:raw_text])
+            break
+          end
+        end if !attr['id'] && @stack.last.options[:ial] && @stack.last.options[:ial][:refs]
+        format_as_block_html(el.type, attr, inner(el, indent), indent)
       end
 
       def convert_html_element(el, indent)
@@ -236,14 +243,7 @@ module Kramdown
       end
 
       def convert_a(el, indent)
-        res = inner(el, indent)
-        attr = el.attr.dup
-        if attr['href'].start_with?('mailto:')
-          mail_addr = attr['href'][7..-1]
-          attr['href'] = obfuscate('mailto') << ":" << obfuscate(mail_addr)
-          res = obfuscate(res) if res == mail_addr
-        end
-        format_as_span_html(el.type, attr, res)
+        format_as_span_html(el.type, el.attr, inner(el, indent))
       end
 
       def convert_img(el, indent)
@@ -315,10 +315,14 @@ module Kramdown
       def convert_math(el, indent)
         if (result = format_math(el, :indent => indent))
           result
-        elsif el.options[:category] == :block
-          format_as_block_html('pre', el.attr, "$$\n#{el.value}\n$$", indent)
         else
-          format_as_span_html('span', el.attr, "$#{el.value}$")
+          attr = el.attr.dup
+          (attr['class'] = (attr['class'] || '') << " kdmath").lstrip!
+          if el.options[:category] == :block
+            format_as_block_html('div', attr, "$$\n#{el.value}\n$$", indent)
+          else
+            format_as_span_html('span', attr, "$#{el.value}$")
+          end
         end
       end
 

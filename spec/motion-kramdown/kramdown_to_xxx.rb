@@ -4,6 +4,7 @@ describe "kramdown-to-xxx conversion" do
     'test/testcases/block/04_header/with_auto_ids.text',          # bc no transliteration support yet
     'test/testcases/block/06_codeblock/highlighting-opts.text',   # bc no highlight support yet
     'test/testcases/block/06_codeblock/rouge/simple.text',        # bc no highlight support yet
+    'test/testcases/block/06_codeblock/rouge/multiple.text',      # bc no highlight support yet
     'test/testcases/block/06_codeblock/highlighting.text',        # bc no highlight support yet
     'test/testcases/block/06_codeblock/highlighting-minted.text', # bc no highlight support yet
     'test/testcases/block/06_codeblock/highlighting-minted-with-opts.text', # bc no highlight support yet

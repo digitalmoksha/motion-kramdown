@@ -9,6 +9,7 @@ describe "html-to-kramdown-to-html conversion" do
       'test/testcases/block/04_header/header_type_offset.html',         # bc of header_offset option
       'test/testcases/block/06_codeblock/whitespace.html',              # bc of entity to char conversion
       'test/testcases/block/06_codeblock/rouge/simple.html',            # bc of double surrounding <div>
+      'test/testcases/block/06_codeblock/rouge/multiple.html',          # bc of double surrounding <div>
       'test/testcases/block/09_html/simple.html',                       # bc of webgen:block elements
       'test/testcases/block/09_html/markdown_attr.html',                # bc of markdown attr
       'test/testcases/block/09_html/html_to_native/table_simple.html',  # bc of invalidly converted simple table

@@ -31,7 +31,7 @@ module Kramdown
 
       def convert(el, opts = {:indent => 0})
         res = send("convert_#{el.type}", el, opts)
-        if ![:html_element, :li, :dd, :td].include?(el.type) && (ial = ial_for_element(el))
+        if ![:html_element, :li, :dt, :dd, :td].include?(el.type) && (ial = ial_for_element(el))
           res << ial
           res << "\n\n" if Element.category(el) == :block
         elsif [:ul, :dl, :ol, :codeblock].include?(el.type) && opts[:next] &&
@@ -174,7 +174,11 @@ module Kramdown
       end
 
       def convert_dt(el, opts)
-        inner(el, opts) << "\n"
+        result = ''
+        if ial = ial_for_element(el)
+          result << ial << " "
+        end
+        result << inner(el, opts) << "\n"
       end
 
       HTML_TAGS_WITH_BODY=['div', 'script', 'iframe', 'textarea']
@@ -414,6 +418,10 @@ module Kramdown
           (el.options[:ial] && (el.options[:ial][:refs] || []).include?('toc'))  # RM can't use rescue nil
         res = "footnotes" << (res.strip.empty? ? '' : " #{res}") if (el.type == :ul || el.type == :ol) &&
           (el.options[:ial] && (el.options[:ial][:refs] || []).include?('footnotes')) # RM can't use rescue nil
+        if el.type == :dl && el.options[:ial] && el.options[:ial][:refs]
+          auto_ids = el.options[:ial][:refs].select {|ref| ref =~ /\Aauto_ids/}.join(" ")
+          res = auto_ids << (res.strip.empty? ? '' : " #{res}") unless auto_ids.empty?
+        end
         res.strip.empty? ? nil : "{:#{res}}"
       end
 

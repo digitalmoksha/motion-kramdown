@@ -10,6 +10,8 @@
 #
 # :stopdoc:
 
+# RM require 'rbconfig'
+
 if RUBY_VERSION <= '1.8.6'
   # RM require 'rexml/parsers/baseparser'
   module REXML
@@ -31,6 +33,16 @@ if RUBY_VERSION <= '1.8.6'
       end
     end
 
+  end
+
+end
+
+if !Symbol.instance_methods.include?("<=>")
+
+  class Symbol
+    def <=>(other)
+      self.to_s <=> other.to_s
+    end
   end
 
 end
