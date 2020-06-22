@@ -23,6 +23,10 @@ module Kramdown
           @block_parsers.delete(current)
           @block_parsers.insert(i, replacement)
         end
+
+        i = @span_parsers.index(:escaped_chars)
+        @span_parsers[i] = :escaped_chars_gfm if i
+        @span_parsers << :strikethrough_gfm
       end
 
       def parse
@@ -57,8 +61,31 @@ module Kramdown
       ATX_HEADER_START = /^\#{1,6}\s/
       define_parser(:atx_header_gfm, ATX_HEADER_START, nil, 'parse_atx_header')
 
-      FENCED_CODEBLOCK_MATCH = /^(([~`]){3,})\s*?(\w[\w-]*)?\s*?\n(.*?)^\1\2*\s*?\n/m
+      FENCED_CODEBLOCK_MATCH = /^(([~`]){3,})\s*?((\S+)(?:\?\S*)?)?\s*?\n(.*?)^\1\2*\s*?\n/m
       define_parser(:codeblock_fenced_gfm, /^[~`]{3,}/, nil, 'parse_codeblock_fenced')
+
+      STRIKETHROUGH_DELIM = /~~/
+      STRIKETHROUGH_MATCH = /#{STRIKETHROUGH_DELIM}[^\s~](.*?)[^\s~]#{STRIKETHROUGH_DELIM}/m
+      define_parser(:strikethrough_gfm, STRIKETHROUGH_MATCH, '~~')
+
+      def parse_strikethrough_gfm
+        line_number = @src.current_line_number
+
+        @src.pos += @src.matched_size
+        el = Element.new(:html_element, 'del', {}, :category => :span, :line => line_number)
+        @tree.children << el
+
+        env = save_env
+        reset_env(:src => Kramdown::Utils::StringScanner.new(@src.matched[2..-3], line_number),
+                  :text_type => :text)
+        parse_spans(el)
+        restore_env(env)
+
+        el
+      end
+
+      ESCAPED_CHARS_GFM = /\\([\\.*_+`<>()\[\]{}#!:\|"'\$=\-~])/
+      define_parser(:escaped_chars_gfm, ESCAPED_CHARS_GFM, '\\\\', :parse_escaped_chars)
 
     end
   end

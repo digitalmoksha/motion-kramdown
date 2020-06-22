@@ -10,8 +10,8 @@ describe "html-to-{html,kramdown} conversion" do
       'test/testcases/span/03_codespan/highlighting.html',          # bc of span elements inside code element
       'test/testcases/block/04_header/with_auto_ids.html',          # bc of auto_ids=true option
       'test/testcases/block/04_header/header_type_offset.html',     # bc of header_offset option
-      'test/testcases/block/06_codeblock/rouge/highlighting-rouge.html',  # bc of double surrounding <div>
-      ('test/testcases/span/03_codespan/rouge/highlighting-rouge.html'    if RUBY_VERSION < '2.0'),
+      'test/testcases/block/06_codeblock/rouge/simple.html',        # bc of double surrounding <div>
+      ('test/testcases/span/03_codespan/rouge/simple.html'    if RUBY_VERSION < '2.0'),
       'test/testcases/block/15_math/ritex.html',                    # bc of tidy
       'test/testcases/span/math/ritex.html',                        # bc of tidy
       'test/testcases/block/15_math/itex2mml.html',                 # bc of tidy
@@ -22,6 +22,7 @@ describe "html-to-{html,kramdown} conversion" do
       'test/testcases/block/15_math/gh_128.html',                   # bc no math support yet
       'test/testcases/block/15_math/normal.html',                   # bc no math support yet
       'test/testcases/span/math/normal.html',                       # bc no math support yet
+      'test/testcases/span/05_html/mark_element.html',              # bc of tidy
     ].compact
 
     EXCLUDE_HTML_TEXT_FILES = ['test/testcases/block/09_html/parse_as_span.htmlinput',

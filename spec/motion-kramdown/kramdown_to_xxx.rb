@@ -3,7 +3,7 @@ describe "kramdown-to-xxx conversion" do
   EXCLUDE_FILES = [
     'test/testcases/block/04_header/with_auto_ids.text',          # bc no transliteration support yet
     'test/testcases/block/06_codeblock/highlighting-opts.text',   # bc no highlight support yet
-    'test/testcases/block/06_codeblock/rouge/highlighting-rouge.text',  # bc no highlight support yet
+    'test/testcases/block/06_codeblock/rouge/simple.text',        # bc no highlight support yet
     'test/testcases/block/06_codeblock/highlighting.text',        # bc no highlight support yet
     'test/testcases/block/06_codeblock/highlighting-minted.text', # bc no highlight support yet
     'test/testcases/block/06_codeblock/highlighting-minted-with-opts.text', # bc no highlight support yet
@@ -22,7 +22,7 @@ describe "kramdown-to-xxx conversion" do
     'test/testcases/span/math/mathjaxnode.text',                  # bc no math support yet
     'test/testcases/span/math/normal.text',                       # bc no math support yet
     'test/testcases/span/math/ritex.text',                        # bc no math support yet
-    'test/testcases/span/03_codespan/rouge/highlighting-rouge.text',    # bc no highlight support yet
+    'test/testcases/span/03_codespan/rouge/simple.text',          # bc no highlight support yet
     'test/testcases/span/03_codespan/highlighting.text',          # bc no highlight support yet
     'test/testcases/span/03_codespan/highlighting-minted.text',   # bc no highlight support yet
   ].compact

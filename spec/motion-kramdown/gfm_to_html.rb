@@ -59,8 +59,8 @@ describe "gfm-to-html conversion" do
    'test/testcases/span/text_substitutions/entities_as_char.text',
    'test/testcases/span/text_substitutions/entities.text',
    'test/testcases/span/text_substitutions/typography.text',
-   ('test/testcases/span/03_codespan/rouge/highlighting-rouge.text' if RUBY_VERSION < '2.0'),
-   ('test/testcases/block/06_codeblock/rouge/highlighting-rouge.text' if RUBY_VERSION < '2.0'), #bc of rouge
+   ('test/testcases/span/03_codespan/rouge/simple.text' if RUBY_VERSION < '2.0'),
+   ('test/testcases/block/06_codeblock/rouge/simple.text' if RUBY_VERSION < '2.0'), #bc of rouge
 
    'test/testcases/block/04_header/with_auto_ids.text',          # bc no transliteration support yet
    'test/testcases/block/06_codeblock/highlighting-opts.text',   # bc no highlight support yet
@@ -76,7 +76,7 @@ describe "gfm-to-html conversion" do
    'test/testcases/span/math/mathjaxnode.text',                  # bc no math support yet
    'test/testcases/span/math/normal.text',                       # bc no math support yet
    'test/testcases/span/math/ritex.text',                        # bc no math support yet
-   'test/testcases/span/03_codespan/rouge/highlighting-rouge.text',    # bc no highlight support yet
+   'test/testcases/span/03_codespan/rouge/simple.text',    # bc no highlight support yet
    'test/testcases/span/03_codespan/highlighting.text',          # bc no highlight support yet
    'test/testcases_gfm/backticks_syntax.text',                   # bc no highlight support yet
   ].compact
