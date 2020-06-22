@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2016 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
@@ -90,7 +90,7 @@ module Kramdown
             list.children << item
 
             #------------------------------------------------------------------------------
-            # RM don't know why, but using the item.options[:ial] directly in the block 
+            # RM don't know why, but using the item.options[:ial] directly in the block
             # caused an object to be autoreleased one too many times in RubyMotion,
             # crashing the app. So use this workaround
             item_options = (item.options[:ial] ||= {}) # RM
@@ -207,7 +207,7 @@ module Kramdown
             deflist.children << item
 
             #------------------------------------------------------------------------------
-            # RM don't know why, but using the item.options[:ial] directly in the block 
+            # RM don't know why, but using the item.options[:ial] directly in the block
             # caused an object to be autoreleased one too many times in RubyMotion,
             # crashing the app. So use this workaround
             item_options = (item.options[:ial] ||= {}) # RM

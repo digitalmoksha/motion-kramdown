@@ -16,6 +16,7 @@ describe "text-to-kramdown-to-html conversion" do
       'test/testcases/block/09_html/html_to_native/table_simple.text',  # bc of tr style attr getting removed
       'test/testcases/block/09_html/markdown_attr.text',                # bc of markdown attr
       'test/testcases/block/09_html/simple.text',                       # bc of webgen:block elements
+      'test/testcases/block/09_html/xml.text',                          # bc of tidy
       'test/testcases/block/11_ial/simple.text',                        # bc of change of ordering of attributes in header
       'test/testcases/block/12_extension/options.text',                 # bc of options option
       'test/testcases/block/12_extension/options3.text',                # bc of options option
@@ -33,6 +34,7 @@ describe "text-to-kramdown-to-html conversion" do
       'test/testcases/span/03_codespan/highlighting.text',              # bc no highlight support yet
       ('test/testcases/span/03_codespan/rouge/simple.text' if RUBY_VERSION < '2.0'),
       'test/testcases/span/05_html/markdown_attr.text',                 # bc of markdown attr
+      'test/testcases/span/05_html/xml.text',                           # bc of tidy
       'test/testcases/span/extension/options.text',                     # bc of parse_span_html option
       'test/testcases/span/extension/comment.text',                     # bc of comment text modifications (can this be avoided?)
       'test/testcases/span/math/itex2mml.text',                         # bc of tidy

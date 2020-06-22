@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2016 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
@@ -61,7 +61,7 @@ module Kramdown
       ATX_HEADER_START = /^\#{1,6}\s/
       define_parser(:atx_header_gfm, ATX_HEADER_START, nil, 'parse_atx_header')
 
-      FENCED_CODEBLOCK_MATCH = /^(([~`]){3,})\s*?((\S+)(?:\?\S*)?)?\s*?\n(.*?)^\1\2*\s*?\n/m
+      FENCED_CODEBLOCK_MATCH = /^(([~`]){3,})\s*?((\S+?)(?:\?\S*)?)?\s*?\n(.*?)^\1\2*\s*?\n/m
       define_parser(:codeblock_fenced_gfm, /^[~`]{3,}/, nil, 'parse_codeblock_fenced')
 
       STRIKETHROUGH_DELIM = /~~/
