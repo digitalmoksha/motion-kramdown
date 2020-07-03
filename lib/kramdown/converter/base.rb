@@ -232,9 +232,6 @@ module Kramdown
       def generate_id(str)
         str = ::Kramdown::Utils::Unidecoder.decode(str) if @options[:transliterated_header_ids]
         gen_id = basic_generate_id(str)
-        gen_id.tr!('^a-zA-Z0-9 -', '')
-        gen_id.tr!(' ', '-')
-        gen_id.downcase!
         gen_id = 'section' if gen_id.length == 0
         @used_ids ||= {}
         if @used_ids.has_key?(gen_id)

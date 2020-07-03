@@ -15,9 +15,10 @@ describe "kramdown-to-xxx conversion" do
     'test/testcases/block/15_math/ritex.text',                    # bc no math support yet
     'test/testcases/block/15_math/mathjax_preview.text',          # bc no math support yet
     'test/testcases/block/15_math/mathjax_preview_simple.text',   # bc no math support yet
-    'test/testcases/block/15_math/mathjaxnode_notexhints.text',       # bc no math support yet
-    'test/testcases/block/15_math/mathjaxnode_semantics.text',        # bc no math support yet
-    'test/testcases/block/15_math/mathjaxnode.text',                  # bc no math support yet
+    'test/testcases/block/15_math/mathjax_preview_as_code.text',  # bc no math support yet
+    'test/testcases/block/15_math/mathjaxnode_notexhints.text',   # bc no math support yet
+    'test/testcases/block/15_math/mathjaxnode_semantics.text',    # bc no math support yet
+    'test/testcases/block/15_math/mathjaxnode.text',              # bc no math support yet
 
     'test/testcases/span/math/itex2mml.text',                     # bc no math support yet
     'test/testcases/span/math/mathjaxnode.text',                  # bc no math support yet

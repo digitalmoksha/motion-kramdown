@@ -27,6 +27,7 @@ describe "text-to-kramdown-to-html conversion" do
       'test/testcases/block/15_math/normal.text',                       # bc no math support yet
       'test/testcases/block/15_math/mathjax_preview.text',              # bc no math support yet
       'test/testcases/block/15_math/mathjax_preview_simple.text',       # bc no math support yet
+      'test/testcases/block/15_math/mathjax_preview_as_code.text',      # bc no math support yet
       'test/testcases/block/15_math/mathjaxnode_notexhints.text',       # bc no math support yet
       'test/testcases/block/15_math/mathjaxnode_semantics.text',        # bc no math support yet
       'test/testcases/block/15_math/mathjaxnode.text',                  # bc no math support yet

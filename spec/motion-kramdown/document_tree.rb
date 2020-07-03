@@ -18,6 +18,8 @@ describe "asserting that converters don't modify the document tree" do
     'test/testcases/block/15_math/mathjaxnode_notexhints.text',       # bc no math support yet
     'test/testcases/block/15_math/mathjaxnode_semantics.text',        # bc no math support yet
     'test/testcases/block/15_math/mathjaxnode.text',                  # bc no math support yet
+    'test/testcases/block/15_math/mathjax_preview_as_code.text',      # bc no math support yet
+    'test/testcases/man/example.text',                                # bc no math support yet
     'test/testcases/span/math/mathjaxnode.text',                      # bc no math support yet
     'test/testcases/span/math/normal.text',                           # bc no math support yet
     'test/testcases/span/math/ritex.text',                            # bc no math support yet

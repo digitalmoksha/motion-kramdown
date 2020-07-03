@@ -82,6 +82,7 @@ class TestFiles < Minitest::Test
                           'test/testcases/span/math/mathjaxnode.html', # bc of tidy
                           'test/testcases/block/15_math/mathjax_preview.html', # bc of mathjax preview
                           'test/testcases/block/15_math/mathjax_preview_simple.html', # bc of mathjax preview
+                          'test/testcases/block/15_math/mathjax_preview_as_code.html', # bc of mathjax preview
                           'test/testcases/span/05_html/mark_element.html', # bc of tidy
                           'test/testcases/block/09_html/xml.html', # bc of tidy
                           'test/testcases/span/05_html/xml.html', # bc of tidy
@@ -241,6 +242,7 @@ class TestFiles < Minitest::Test
                              'test/testcases/span/math/mathjaxnode.html', # bc of tidy
                              'test/testcases/block/15_math/mathjax_preview.html', # bc of mathjax preview
                              'test/testcases/block/15_math/mathjax_preview_simple.html', # bc of mathjax preview
+                             'test/testcases/block/15_math/mathjax_preview_as_code.html', # bc of mathjax preview
                              'test/testcases/span/01_link/link_defs_with_ial.html', # bc of attribute ordering
                              'test/testcases/span/05_html/mark_element.html', # bc of tidy
                              'test/testcases/block/09_html/xml.html', # bc of tidy
@@ -261,12 +263,23 @@ class TestFiles < Minitest::Test
     end
   end
 
+  # Generate test methods for text-manpage conversion
+  Dir[File.dirname(__FILE__) + '/testcases/man/**/*.text'].each do |text_file|
+    define_method('test_' + text_file.tr('.', '_') + "_to_man") do
+      man_file = text_file.sub(/\.text$/, '.man')
+      doc =  Kramdown::Document.new(File.read(text_file))
+      assert_equal(File.read(man_file), doc.to_man)
+    end
+  end
+
   EXCLUDE_GFM_FILES = [
                        'test/testcases/block/03_paragraph/no_newline_at_end.text',
                        'test/testcases/block/03_paragraph/indented.text',
                        'test/testcases/block/03_paragraph/two_para.text',
                        'test/testcases/block/04_header/atx_header.text',
                        'test/testcases/block/04_header/setext_header.text',
+                       'test/testcases/block/04_header/with_auto_ids.text', # bc of ID generation difference
+                       'test/testcases/block/04_header/with_auto_id_prefix.text', # bc of ID generation difference
                        'test/testcases/block/05_blockquote/indented.text',
                        'test/testcases/block/05_blockquote/lazy.text',
                        'test/testcases/block/05_blockquote/nested.text',
@@ -280,6 +293,7 @@ class TestFiles < Minitest::Test
                        'test/testcases/block/08_list/other_first_element.text',
                        'test/testcases/block/08_list/simple_ul.text',
                        'test/testcases/block/08_list/special_cases.text',
+                       'test/testcases/block/08_list/lazy_and_nested.text', # bc of change in lazy line handling
                        'test/testcases/block/09_html/comment.text',
                        'test/testcases/block/09_html/html_to_native/code.text',
                        'test/testcases/block/09_html/html_to_native/emphasis.text',
@@ -298,6 +312,7 @@ class TestFiles < Minitest::Test
                        'test/testcases/block/14_table/escaping.text',
                        'test/testcases/block/14_table/simple.text',
                        'test/testcases/block/15_math/normal.text',
+                       'test/testcases/block/16_toc/toc_with_footnotes.text', # bc of ID generation difference
                        'test/testcases/encoding.text',
                        'test/testcases/span/01_link/inline.text',
                        'test/testcases/span/01_link/link_defs.text',

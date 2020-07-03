@@ -16,6 +16,7 @@ describe "html-to-{html,kramdown} conversion" do
       'test/testcases/block/15_math/itex2mml.html',                 # bc of tidy
       'test/testcases/block/15_math/mathjax_preview.html',          # bc of mathjax preview
       'test/testcases/block/15_math/mathjax_preview_simple.html',   # bc of mathjax preview
+      'test/testcases/block/15_math/mathjax_preview_as_code.html',  # bc no math support yet
       'test/testcases/block/15_math/gh_128.html',                   # bc no math support yet
       'test/testcases/block/15_math/normal.html',                   # bc no math support yet
 

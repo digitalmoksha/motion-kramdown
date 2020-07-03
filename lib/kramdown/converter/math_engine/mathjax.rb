@@ -36,10 +36,20 @@ module Kramdown::Converter::MathEngine
 
       preview = (preview == true ? converter.escape_html(el.value) : preview.to_s)
 
+      preview_as_code = converter.options[:math_engine_opts][:preview_as_code]
+
       if el.options[:category] == :block
-        converter.format_as_block_html('div', {'class' => 'MathJax_Preview'}, preview, opts[:indent])
+        if preview_as_code
+          converter.format_as_block_html('pre', {'class' => 'MathJax_Preview'},
+                                         converter.format_as_span_html('code', {}, preview),
+                                         opts[:indent])
+        else
+          converter.format_as_block_html('div', {'class' => 'MathJax_Preview'}, preview,
+                                         opts[:indent])
+        end
       else
-        converter.format_as_span_html('span', {'class' => 'MathJax_Preview'}, preview)
+        converter.format_as_span_html(preview_as_code ? 'code' : 'span',
+                                      {'class' => 'MathJax_Preview'}, preview)
       end
     end
 

@@ -347,7 +347,7 @@ module Kramdown
                  else
                    ''
                  end
-                 result.sub!(/#{@toc_code.last}/, text.gsub(/\\/, "\\\\\\\\"))
+          result.sub!(/#{@toc_code.last}/, text.gsub(/\\/, "\\\\\\\\"))
         end
         result
       end

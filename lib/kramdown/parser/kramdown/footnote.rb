@@ -61,4 +61,3 @@ module Kramdown
     end
   end
 end
-

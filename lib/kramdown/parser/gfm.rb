@@ -16,6 +16,9 @@ module Kramdown
 
       def initialize(source, options)
         super
+        @options[:auto_id_stripping] = true
+        @id_counter = Hash.new(-1)
+
         @span_parsers.delete(:line_break) if @options[:hard_wrap]
         if @options[:gfm_quirks].include?(:paragraph_end)
           atx_header_parser = :atx_header_gfm_quirk
@@ -39,12 +42,12 @@ module Kramdown
 
       def parse
         super
-        add_hard_line_breaks(@root) if @options[:hard_wrap]
+        update_elements(@root)
       end
 
-      def add_hard_line_breaks(element)
+      def update_elements(element)
         element.children.map! do |child|
-          if child.type == :text && child.value =~ /\n/
+          if child.type == :text && @options[:hard_wrap] && child.value =~ /\n/
             children = []
             lines = child.value.split(/\n/, -1)
             omit_trailing_br = (Kramdown::Element.category(element) == :block && element.children[-1] == child &&
@@ -59,11 +62,47 @@ module Kramdown
             children
           elsif child.type == :html_element
             child
+          elsif child.type == :header && @options[:auto_ids] && !child.attr.has_key?('id')
+            child.attr['id'] = generate_gfm_header_id(child.options[:raw_text])
+            child
           else
-            add_hard_line_breaks(child)
+            update_elements(child)
             child
           end
         end.flatten!
+      end
+
+      # Update the raw text for automatic ID generation.
+      def update_raw_text(item)
+        raw_text = ''
+
+        append_text = lambda do |child|
+          if child.type == :text || child.type == :codespan || child.type ==:math
+            raw_text << child.value
+          elsif child.type == :entity
+            raw_text << child.value.char
+          elsif child.type == :smart_quote
+            raw_text << ::Kramdown::Utils::Entities.entity(child.value.to_s).char
+          elsif child.type == :typographic_sym
+            raw_text << ::Kramdown::Utils::Entities.entity(child.value.to_s).char
+          else
+            child.children.each {|c| append_text.call(c)}
+          end
+        end
+
+        append_text.call(item)
+        item.options[:raw_text] = raw_text
+      end
+
+      NON_WORD_RE = (RUBY_VERSION > "1.9" ? /[^\p{Word}\- \t]/ : /[^\w\- \t]/)
+
+      def generate_gfm_header_id(text)
+        result = text.downcase
+        result.gsub!(NON_WORD_RE, '')
+        result.tr!(" \t", '-')
+        @id_counter[result] += 1
+        result << (@id_counter[result] > 0 ? "-#{@id_counter[result]}" : '')
+        @options[:auto_id_prefix] + result
       end
 
       ATX_HEADER_START = /^\#{1,6}\s/
@@ -85,8 +124,8 @@ module Kramdown
         true
       end
 
-      FENCED_CODEBLOCK_START = /^[~`]{3,}/
-      FENCED_CODEBLOCK_MATCH = /^(([~`]){3,})\s*?((\S+?)(?:\?\S*)?)?\s*?\n(.*?)^\1\2*\s*?\n/m
+      FENCED_CODEBLOCK_START = /^[ ]{0,3}[~`]{3,}/
+      FENCED_CODEBLOCK_MATCH = /^[ ]{0,3}(([~`]){3,})\s*?((\S+?)(?:\?\S*)?)?\s*?\n(.*?)^[ ]{0,3}\1\2*\s*?\n/m
       define_parser(:codeblock_fenced_gfm, FENCED_CODEBLOCK_START, nil, 'parse_codeblock_fenced')
 
       STRIKETHROUGH_DELIM = /~~/

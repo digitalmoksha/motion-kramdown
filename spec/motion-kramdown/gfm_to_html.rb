@@ -6,7 +6,8 @@ describe "gfm-to-html conversion" do
    'test/testcases/block/03_paragraph/two_para.text',
    'test/testcases/block/04_header/atx_header.text',
    'test/testcases/block/04_header/setext_header.text',
-   'test/testcases/block/04_header/with_auto_ids.text',          # bc no transliteration support yet
+   'test/testcases/block/04_header/with_auto_ids.text', # bc of ID generation difference
+   'test/testcases/block/04_header/with_auto_id_prefix.text', # bc of ID generation difference
    'test/testcases/block/05_blockquote/indented.text',
    'test/testcases/block/05_blockquote/lazy.text',
    'test/testcases/block/05_blockquote/nested.text',
@@ -20,6 +21,7 @@ describe "gfm-to-html conversion" do
    'test/testcases/block/08_list/escaping.text',
    'test/testcases/block/08_list/item_ial.text',
    'test/testcases/block/08_list/lazy.text',
+   'test/testcases/block/08_list/lazy_and_nested.text', # bc of change in lazy line handling
    'test/testcases/block/08_list/list_and_others.text',
    'test/testcases/block/08_list/other_first_element.text',
    'test/testcases/block/08_list/simple_ul.text',
@@ -52,6 +54,8 @@ describe "gfm-to-html conversion" do
    'test/testcases/block/15_math/ritex.text',                    # bc no math support yet
    'test/testcases/block/15_math/mathjax_preview.text',          # bc no math support yet
    'test/testcases/block/15_math/mathjax_preview_simple.text',   # bc no math support yet
+   'test/testcases/block/15_math/mathjax_preview_as_code.text',  # bc no math support yet
+   'test/testcases/block/16_toc/toc_with_footnotes.text',        # bc of ID generation difference
 
    'test/testcases/encoding.text',
 
@@ -83,6 +87,7 @@ describe "gfm-to-html conversion" do
    'test/testcases/span/text_substitutions/typography.text',
 
    'test/testcases_gfm/backticks_syntax.text',                   # bc no highlight support yet
+   'test/testcases_gfm/header_ids.text',                         # bc no math support yet
   ].compact
 
   ['testcases', 'testcases_gfm'].each do |item|
