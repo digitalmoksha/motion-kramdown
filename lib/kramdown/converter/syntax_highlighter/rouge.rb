@@ -19,6 +19,14 @@ module Kramdown::Converter::SyntaxHighlighter
       # RM AVAILABLE = true
     # RM rescue LoadError, SyntaxError
       AVAILABLE = false  # :nodoc:
+
+      # RM begin
+      # RM   # Rouge::Formatters::HTMLLegacy is available on Rouge 2.0 or later
+      # RM   FORMATTER_CLASS = ::Rouge::Formatters::HTMLLegacy
+      # RM rescue NameError
+      # RM   # Fallbacks to Rouge 1.x formatter if Rouge::Formatters::HTMLLegacy is not available
+      # RM   FORMATTER_CLASS = ::Rouge::Formatters::HTML
+      # RM end
     end
 
     def self.call(converter, text, lang, type, call_opts)
@@ -27,7 +35,8 @@ module Kramdown::Converter::SyntaxHighlighter
       lexer = ::Rouge::Lexer.find_fancy(lang || opts[:default_lang], text)
       return nil if opts[:disable] || !lexer
 
-      formatter = (opts.fetch(:formatter, ::Rouge::Formatters::HTML)).new(opts)
+      opts[:css_class] ||= 'highlight' # For backward compatibility when using Rouge 2.0
+      formatter = (opts.fetch(:formatter, FORMATTER_CLASS)).new(opts)
       formatter.format(lexer.lex(text))
     end
 

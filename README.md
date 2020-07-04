@@ -5,7 +5,7 @@
 
 [kramdown](https://github.com/gettalong/kramdown) Markdown parser, for use with RubyMotion on iOS and OS X.
 
-Currently implements: _kramdown_ 1.13.2
+Currently implements: _kramdown_ 1.14.0
 
 ## Introduction
 
@@ -84,4 +84,5 @@ All credit for _kramdown_ belongs to Thomas Leitner.  _motion-kramdown_ is a sim
 
 _motion-kramdown_ is released under the MIT license (see the **COPYING** file) and therefore can easily be used in commercial projects.
 
-However, if you use _motion-kramdown_ in a commercial setting, please consider **contributing back any changes** for the benefit of the community and/or **making a donation** (see the links in the sidebar on the [kramdown homepage](http://kramdown.gettalong.org/).
+However, if you use _motion-kramdown_ in a commercial setting, please consider **contributing back any changes** for the benefit of the community and/or
+[**becoming a patron**](https://www.patreon.com/gettalong) - thanks!
