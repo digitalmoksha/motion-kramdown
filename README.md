@@ -5,7 +5,7 @@
 
 [kramdown](https://github.com/gettalong/kramdown) Markdown parser, for use with RubyMotion on iOS and OS X.
 
-Currently implements: _kramdown_ 1.6
+Currently implements: _kramdown_ 1.13.2
 
 ## Introduction
 
