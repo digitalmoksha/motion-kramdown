@@ -7,9 +7,9 @@
 #++
 #
 
-# RM require 'erb'
-# RM require 'kramdown/utils'
-# RM require 'kramdown/document'
+require 'erb'
+require 'kramdown/utils'
+require 'kramdown/document'
 
 module Kramdown
 

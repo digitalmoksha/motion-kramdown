@@ -7,7 +7,7 @@
 #++
 #
 
-# RM require 'kramdown/parser/kramdown/escaped_chars'
+require 'kramdown/parser/kramdown/escaped_chars'
 
 module Kramdown
   module Parser

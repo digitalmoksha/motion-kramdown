@@ -7,8 +7,8 @@
 #++
 #
 
-# RM require 'kramdown/utils'
-# RM require 'kramdown/parser'
+require 'kramdown/utils'
+require 'kramdown/parser'
 
 module Kramdown
 

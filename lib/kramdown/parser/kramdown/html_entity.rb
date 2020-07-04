@@ -7,7 +7,7 @@
 #++
 #
 
-# RM require 'kramdown/parser/html'
+require 'kramdown/parser/html'
 
 module Kramdown
   module Parser

@@ -7,7 +7,7 @@
 #++
 #
 
-# RM require 'kramdown/parser/kramdown/block_boundary'
+require 'kramdown/parser/kramdown/block_boundary'
 
 module Kramdown
   module Parser

@@ -7,7 +7,7 @@
 #++
 #
 
-# RM require 'kramdown/converter'
+require 'kramdown/converter'
 
 module Kramdown
 

@@ -36,22 +36,22 @@
 # MIT - see the COPYING file.
 
 
-# RM require 'kramdown/compatibility'
-#
-# RM require 'kramdown/version'
-# RM require 'kramdown/element'
-# RM require 'kramdown/error'
-# RM require 'kramdown/parser'
-# RM require 'kramdown/converter'
-# RM require 'kramdown/options'
-# RM require 'kramdown/utils'
+require 'kramdown/compatibility'
+
+require 'kramdown/version'
+require 'kramdown/element'
+require 'kramdown/error'
+require 'kramdown/parser'
+require 'kramdown/converter'
+require 'kramdown/options'
+require 'kramdown/utils'
 
 module Kramdown
 
   # Return the data directory for kramdown.
   def self.data_dir
     unless defined?(@@data_dir)
-      # RM require 'rbconfig'
+      require 'rbconfig'
       @@data_dir = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'data', 'kramdown'))
       @@data_dir = File.expand_path(File.join(RbConfig::CONFIG["datadir"], "kramdown")) if !File.exists?(@@data_dir)
       raise "kramdown data directory not found! This is a bug, please report it!" unless File.directory?(@@data_dir)

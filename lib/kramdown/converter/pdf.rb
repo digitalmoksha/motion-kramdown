@@ -7,11 +7,11 @@
 #++
 #
 
-# RM require 'prawn'
-# RM require 'prawn/table'
-# RM require 'kramdown/converter'
-# RM require 'kramdown/utils'
-# RM require 'open-uri'
+require 'prawn'
+require 'prawn/table'
+require 'kramdown/converter'
+require 'kramdown/utils'
+require 'open-uri'
 
 module Kramdown
 

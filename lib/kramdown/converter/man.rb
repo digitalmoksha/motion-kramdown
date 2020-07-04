@@ -7,7 +7,7 @@
 #++
 #
 
-# RM require 'kramdown/converter'
+require 'kramdown/converter'
 
 module Kramdown
 
@@ -66,8 +66,6 @@ module Kramdown
             @title_done = true
             data = el.options[:raw_text].scan(/([^(]+)\s*\((\d\w*)\)(?:\s*-+\s*(.*))?/).first ||
               el.options[:raw_text].scan(/([^\s]+)\s*(?:-*\s+)?()(.*)/).first
-            puts "\n---------> #{data.inspect}"
-            puts el.inspect
             return unless data && data[0]
             name = data[0]
             section = (data[1].to_s.empty? ? el.attr['data-section'] || '7' : data[1])

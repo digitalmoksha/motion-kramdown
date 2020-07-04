@@ -8,7 +8,7 @@
 #
 
 
-# RM require 'strscan'
+require 'strscan'
 
 module Kramdown
   module Utils

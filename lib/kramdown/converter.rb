@@ -7,7 +7,7 @@
 #++
 #
 
-# RM require 'kramdown/utils'
+require 'kramdown/utils'
 
 module Kramdown
 

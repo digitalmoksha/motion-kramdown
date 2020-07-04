@@ -7,9 +7,9 @@
 #++
 #
 
-# RM require 'kramdown/parser/kramdown/extensions'
-# RM require 'kramdown/parser/kramdown/blank_line'
-# RM require 'kramdown/parser/kramdown/eob'
+require 'kramdown/parser/kramdown/extensions'
+require 'kramdown/parser/kramdown/blank_line'
+require 'kramdown/parser/kramdown/eob'
 
 module Kramdown
   module Parser

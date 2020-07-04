@@ -7,8 +7,8 @@
 #++
 #
 
-# RM require 'set'
-# RM require 'kramdown/converter'
+require 'set'
+require 'kramdown/converter'
 
 module Kramdown
 

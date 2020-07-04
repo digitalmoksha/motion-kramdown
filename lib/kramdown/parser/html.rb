@@ -7,10 +7,10 @@
 #++
 #
 
-# RM require 'rexml/parsers/baseparser'
-# RM require 'strscan'
-# RM require 'kramdown/utils'
-# RM require 'kramdown/parser'
+require 'rexml/parsers/baseparser'
+require 'strscan'
+require 'kramdown/utils'
+require 'kramdown/parser'
 
 module Kramdown
 

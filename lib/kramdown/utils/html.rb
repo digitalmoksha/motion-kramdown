@@ -7,7 +7,7 @@
 #++
 #
 
-# RM require 'rexml/parsers/baseparser'
+require 'rexml/parsers/baseparser'
 
 module Kramdown
 

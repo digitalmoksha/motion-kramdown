@@ -7,7 +7,7 @@
 #++
 #
 
-# RM equire 'yaml'
+require 'yaml'
 
 module Kramdown
 

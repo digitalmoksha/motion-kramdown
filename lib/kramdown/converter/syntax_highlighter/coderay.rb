@@ -13,7 +13,7 @@ module Kramdown::Converter::SyntaxHighlighter
   module Coderay
 
     begin
-      # RM require 'coderay'
+      require 'coderay'
 
       # Highlighting via coderay is available if this constant is +true+.
       # RM AVAILABLE = true

@@ -13,7 +13,7 @@ module Kramdown::Converter::MathEngine
   module Itex2MML
 
     begin
-      # RM require 'itextomml'
+      require 'itextomml'
 
       # Itex2MML is available if this constant is +true+.
       AVAILABLE = true

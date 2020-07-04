@@ -13,7 +13,7 @@ module Kramdown::Converter::SyntaxHighlighter
   module Rouge
 
     begin
-      # RM require 'rouge'
+      require 'rouge'
 
       # Highlighting via Rouge is available if this constant is +true+.
       # RM AVAILABLE = true

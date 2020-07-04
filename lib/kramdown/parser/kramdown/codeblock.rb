@@ -7,10 +7,10 @@
 #++
 #
 
-# RM require 'kramdown/parser/kramdown/blank_line'
-# RM require 'kramdown/parser/kramdown/extensions'
-# RM require 'kramdown/parser/kramdown/eob'
-# RM require 'kramdown/parser/kramdown/paragraph'
+require 'kramdown/parser/kramdown/blank_line'
+require 'kramdown/parser/kramdown/extensions'
+require 'kramdown/parser/kramdown/eob'
+require 'kramdown/parser/kramdown/paragraph'
 
 module Kramdown
   module Parser

@@ -13,7 +13,7 @@ module Kramdown::Converter::MathEngine
   module Ritex
 
     begin
-      # RM require 'ritex'
+      require 'ritex'
 
       # Ritex is available if this constant is +true+.
       AVAILABLE = true
