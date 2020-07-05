@@ -19,7 +19,7 @@ module Kramdown
       # RM TODO path = $:.find {|dir| File.directory?(File.join(File.expand_path(dir), "stringex", "unidecoder_data"))}
       path = 'lib' # RM TODO
 
-      if RUBY_VERSION <= '1.8.6' || !path
+      if !path
         def self.decode(string)
           string
         end

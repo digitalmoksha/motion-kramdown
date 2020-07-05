@@ -35,9 +35,6 @@
 #
 # MIT - see the COPYING file.
 
-
-require 'kramdown/compatibility'
-
 require 'kramdown/version'
 require 'kramdown/element'
 require 'kramdown/error'
@@ -53,7 +50,7 @@ module Kramdown
     unless defined?(@@data_dir)
       require 'rbconfig'
       @@data_dir = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'data', 'kramdown'))
-      @@data_dir = File.expand_path(File.join(RbConfig::CONFIG["datadir"], "kramdown")) if !File.exists?(@@data_dir)
+      @@data_dir = File.expand_path(File.join(RbConfig::CONFIG["datadir"], "kramdown")) if !File.exist?(@@data_dir)
       raise "kramdown data directory not found! This is a bug, please report it!" unless File.directory?(@@data_dir)
     end
     @@data_dir
@@ -131,9 +128,9 @@ module Kramdown
 
     # Try requiring a parser or converter class and don't raise an error if the file is not found.
     def try_require(type, name)
-    # RM  require("kramdown/#{type}/#{Utils.snake_case(name)}")
-    # RM  true
-    # RM rescue LoadError
+      require("kramdown/#{type}/#{Utils.snake_case(name)}")
+      true
+    rescue LoadError
       true
     end
     protected :try_require

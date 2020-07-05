@@ -90,7 +90,10 @@ module Kramdown
         update_tree(@root)
         correct_abbreviations_attributes
         replace_abbreviations(@root)
-        @footnotes.each {|name,data| update_tree(data[:content])}
+        @footnotes.each do |name,data|
+          update_tree(data[:content])
+          replace_abbreviations(data[:content])
+        end
         @footnotes.each do |name, data|
           next if data.key?(:marker)
           line = data[:content].options[:location]
@@ -337,29 +340,29 @@ module Kramdown
       # Regexp for matching the optional space (zero or up to three spaces)
       OPT_SPACE = / {0,3}/
 
-      # RM require 'kramdown/parser/kramdown/blank_line'
-      # RM require 'kramdown/parser/kramdown/eob'
-      # RM require 'kramdown/parser/kramdown/paragraph'
-      # RM require 'kramdown/parser/kramdown/header'
-      # RM require 'kramdown/parser/kramdown/blockquote'
-      # RM require 'kramdown/parser/kramdown/table'
-      # RM require 'kramdown/parser/kramdown/codeblock'
-      # RM require 'kramdown/parser/kramdown/horizontal_rule'
-      # RM require 'kramdown/parser/kramdown/list'
-      # RM require 'kramdown/parser/kramdown/link'
-      # RM require 'kramdown/parser/kramdown/extensions'
-      # RM require 'kramdown/parser/kramdown/footnote'
-      # RM require 'kramdown/parser/kramdown/html'
-      # RM require 'kramdown/parser/kramdown/escaped_chars'
-      # RM require 'kramdown/parser/kramdown/html_entity'
-      # RM require 'kramdown/parser/kramdown/line_break'
-      # RM require 'kramdown/parser/kramdown/typographic_symbol'
-      # RM require 'kramdown/parser/kramdown/autolink'
-      # RM require 'kramdown/parser/kramdown/codespan'
-      # RM require 'kramdown/parser/kramdown/emphasis'
-      # RM require 'kramdown/parser/kramdown/smart_quotes'
-      # RM require 'kramdown/parser/kramdown/math'
-      # RM require 'kramdown/parser/kramdown/abbreviation'
+      require 'kramdown/parser/kramdown/blank_line'
+      require 'kramdown/parser/kramdown/eob'
+      require 'kramdown/parser/kramdown/paragraph'
+      require 'kramdown/parser/kramdown/header'
+      require 'kramdown/parser/kramdown/blockquote'
+      require 'kramdown/parser/kramdown/table'
+      require 'kramdown/parser/kramdown/codeblock'
+      require 'kramdown/parser/kramdown/horizontal_rule'
+      require 'kramdown/parser/kramdown/list'
+      require 'kramdown/parser/kramdown/link'
+      require 'kramdown/parser/kramdown/extensions'
+      require 'kramdown/parser/kramdown/footnote'
+      require 'kramdown/parser/kramdown/html'
+      require 'kramdown/parser/kramdown/escaped_chars'
+      require 'kramdown/parser/kramdown/html_entity'
+      require 'kramdown/parser/kramdown/line_break'
+      require 'kramdown/parser/kramdown/typographic_symbol'
+      require 'kramdown/parser/kramdown/autolink'
+      require 'kramdown/parser/kramdown/codespan'
+      require 'kramdown/parser/kramdown/emphasis'
+      require 'kramdown/parser/kramdown/smart_quotes'
+      require 'kramdown/parser/kramdown/math'
+      require 'kramdown/parser/kramdown/abbreviation'
 
     end
 

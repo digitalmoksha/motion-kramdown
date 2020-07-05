@@ -37,6 +37,14 @@ describe "html-to-kramdown-to-html conversion" do
       'test/testcases/span/math/itex2mml.html',                         # bc of tidy
       'test/testcases/span/math/mathjaxnode.html',                      # bc of tidy
       'test/testcases/span/math/normal.html',                           # bc no math support yet
+
+      'test/testcases/span/abbreviations/in_footnote.html',             # bc of issue with nbsp
+      'test/testcases/block/16_toc/toc_with_footnotes.html',            # bc of issue with nbsp
+      'test/testcases/block/12_extension/options.html',                 # bc of issue with nbsp
+      'test/testcases/block/12_extension/options2.html',                # bc of issue with nbsp
+      'test/testcases/span/04_footnote/footnote_nr.html',               # bc of issue with nbsp
+      'test/testcases/span/04_footnote/inside_footnote.html',           # bc of issue with nbsp
+      'test/testcases/span/04_footnote/backlink_text.html',             # bc of issue with nbsp
     ].compact
 
     Dir["#{focus_files(testcase_dir)}.{html,html.19}"].each do |html_file|

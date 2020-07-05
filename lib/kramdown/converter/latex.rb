@@ -137,7 +137,7 @@ module Kramdown
       end
 
       def convert_li(el, opts)
-        "\\item #{latex_link_target(el, true)}#{inner(el, opts).sub(/\n+\Z/, '')}\n"
+        "\\item{} #{latex_link_target(el, true)}#{inner(el, opts).sub(/\n+\Z/, '')}\n"
       end
 
       def convert_dt(el, opts)
@@ -210,9 +210,9 @@ module Kramdown
       def convert_a(el, opts)
         url = el.attr['href']
         if url.start_with?('#')
-          "\\hyperlink{#{escape(url[1..-1])}}{#{inner(el, opts)}}"
+          "\\hyperlink{#{url[1..-1].gsub('%', "\\%")}}{#{inner(el, opts)}}"
         else
-          "\\href{#{escape(url)}}{#{inner(el, opts)}}"
+          "\\href{#{url.gsub('%', "\\%")}}{#{inner(el, opts)}}"
         end
       end
 
@@ -598,7 +598,9 @@ module Kramdown
         "~"  => "\\ensuremath{\\sim}",
         "|"  => "\\textbar{}",
         "<"  => "\\textless{}",
-        ">"  => "\\textgreater{}"
+        ">"  => "\\textgreater{}",
+        "["  => "{[}",
+        "]"  => "{]}",
       }.merge(Hash[*("{}$%&_#".scan(/./).map {|c| [c, "\\#{c}"]}.flatten)]) # :nodoc:
       ESCAPE_RE = Regexp.union(*ESCAPE_MAP.collect {|k,v| k}) # :nodoc:
 

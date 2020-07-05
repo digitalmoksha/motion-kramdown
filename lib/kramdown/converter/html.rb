@@ -386,7 +386,7 @@ module Kramdown
           a = Element.new(:a, nil)
           a.attr['href'] = "##{id}"
           a.attr['id'] = "#{sections.attr['id']}-#{id}"
-          a.children.concat(remove_footnotes(Marshal.load(Marshal.dump(children))))
+          a.children.concat(fix_for_toc_entry(Marshal.load(Marshal.dump(children))))
           li.children.last.children << a
           li.children << Element.new(type)
 
@@ -413,6 +413,21 @@ module Kramdown
         sections
       end
 
+      # Fixes the elements for use in a TOC entry.
+      def fix_for_toc_entry(elements)
+        remove_footnotes(elements)
+        unwrap_links(elements)
+        elements
+      end
+
+      # Remove all link elements by unwrapping them.
+      def unwrap_links(elements)
+        elements.map! do |c|
+          unwrap_links(c.children)
+          c.type == :a ? c.children : c
+        end.flatten!
+      end
+
       # Remove all footnotes from the given elements.
       def remove_footnotes(elements)
         elements.delete_if do |c|
@@ -427,7 +442,7 @@ module Kramdown
         text.each_byte do |b|
           result << (b > 128 ? b.chr : "&#%03d;" % b)
         end
-        result.force_encoding(text.encoding) if result.respond_to?(:force_encoding)
+        result.force_encoding(text.encoding)
         result
       end
 
@@ -459,9 +474,10 @@ module Kramdown
           end
 
           unless @options[:footnote_backlink].empty?
-            para.children << Element.new(:raw, FOOTNOTE_BACKLINK_FMT % [insert_space ? '&nbsp;' : '', name, backlink_text])
+            nbsp = entity_to_str(ENTITY_NBSP)
+            para.children << Element.new(:raw, FOOTNOTE_BACKLINK_FMT % [insert_space ? nbsp : '', name, backlink_text])
             (1..repeat).each do |index|
-              para.children << Element.new(:raw, FOOTNOTE_BACKLINK_FMT % ["&nbsp;", "#{name}:#{index}", "#{backlink_text}<sup>#{index+1}</sup>"])
+              para.children << Element.new(:raw, FOOTNOTE_BACKLINK_FMT % [nbsp, "#{name}:#{index}", "#{backlink_text}<sup>#{index+1}</sup>"])
             end
           end
 
