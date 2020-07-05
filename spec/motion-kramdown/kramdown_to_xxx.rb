@@ -1,5 +1,19 @@
 describe "kramdown-to-xxx conversion" do
 
+  MATHJAX_NODE_AVAILABLE = begin
+                             require 'kramdown/converter/math_engine/mathjaxnode'
+                             Kramdown::Converter::MathEngine::MathjaxNode::AVAILABLE or
+                               warn("Skipping MathjaxNode tests as MathjaxNode is not available")
+                           end
+
+  KATEX_AVAILABLE = begin
+                      / class="katex"/ === Kramdown::Document.
+                        new('$$a$$', {:math_engine => :sskatex}).to_html or
+                        warn("Skipping SsKaTeX tests as SsKaTeX is not available.")
+                    rescue
+                      warn("Skipping SsKaTeX tests as default SsKaTeX config does not work.")
+                    end or warn("Run \"rake dev:test_sskatex_deps\" to see why.")
+
   EXCLUDE_FILES = [
     'test/testcases/block/04_header/with_auto_ids.text',          # bc no transliteration support yet
     'test/testcases/block/06_codeblock/highlighting-opts.text',   # bc no highlight support yet
@@ -27,6 +41,15 @@ describe "kramdown-to-xxx conversion" do
     'test/testcases/span/03_codespan/rouge/simple.text',          # bc no highlight support yet
     'test/testcases/span/03_codespan/highlighting.text',          # bc no highlight support yet
     'test/testcases/span/03_codespan/highlighting-minted.text',   # bc no highlight support yet
+
+    ('test/testcases/block/15_math/mathjaxnode.text' unless MATHJAX_NODE_AVAILABLE),
+    ('test/testcases/block/15_math/mathjaxnode_notexhints.text' unless MATHJAX_NODE_AVAILABLE),
+    ('test/testcases/block/15_math/mathjaxnode_semantics.text' unless MATHJAX_NODE_AVAILABLE),
+    ('test/testcases/span/math/mathjaxnode.text' unless MATHJAX_NODE_AVAILABLE),
+    ('test/testcases/block/15_math/sskatex.text' unless KATEX_AVAILABLE),
+    ('test/testcases/span/math/sskatex.text' unless KATEX_AVAILABLE),
+
+    'test/testcases/span/04_footnote/backlink_inline.text',       # bc no math support yet
   ].compact
 
   Dir["#{focus_files(testcase_dir)}.text"].each do |text_file|

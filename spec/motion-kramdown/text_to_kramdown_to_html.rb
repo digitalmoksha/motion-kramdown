@@ -43,6 +43,10 @@ describe "text-to-kramdown-to-html conversion" do
       'test/testcases/span/math/mathjaxnode.text',                      # bc no math support yet
       'test/testcases/span/math/normal.text',                           # bc no math support yet
       'test/testcases/span/math/ritex.text',                            # bc of tidy
+
+      'test/testcases/block/15_math/sskatex.text',                      # bc of tidy
+      'test/testcases/span/math/sskatex.text',                          # bc of tidy
+      'test/testcases/span/04_footnote/backlink_inline.text',           # bc no math support yet
      ].compact
 
     Dir["#{focus_files(testcase_dir)}.text"].each do |text_file|

@@ -24,6 +24,10 @@ describe "asserting that converters don't modify the document tree" do
     'test/testcases/span/math/normal.text',                           # bc no math support yet
     'test/testcases/span/math/ritex.text',                            # bc no math support yet
     'test/testcases/span/math/itex2mml.text',                         # bc no math support yet
+
+    'test/testcases/block/15_math/sskatex.text',                      # bc no math support yet
+    'test/testcases/span/math/sskatex.text',                          # bc no math support yet
+    'test/testcases/span/04_footnote/backlink_inline.text',           # bc no math support yet
   ].compact
 
   Dir["#{focus_files(testcase_dir)}.text"].each do |text_file|

@@ -49,7 +49,7 @@ module Kramdown
     # RM
     # RM configurable(:math_engine)
     # RM
-    # RM ["Mathjax", "MathjaxNode", "Ritex", "Itex2MML"].each do |klass_name|
+    # RM ['Mathjax', "MathjaxNode", "SsKaTeX", "Ritex", "Itex2MML"].each do |klass_name|
     # RM   kn_down = klass_name.downcase.intern
     # RM   add_math_engine(kn_down) do |converter, el, opts|
     # RM     require "kramdown/converter/math_engine/#{kn_down}"

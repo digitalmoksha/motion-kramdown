@@ -473,6 +473,37 @@ EOF
       val
     end
 
+    define(:typographic_symbols, Object, {}, <<EOF) do |val|
+Defines a mapping from typographical symbol to output characters
+
+Typographical symbols are normally output using their equivalent Unicode
+codepoint. However, sometimes one wants to change the output, mostly to
+fallback to a sequence of ASCII characters.
+
+This option allows this by specifying a mapping from typographical
+symbol to its output string. For example, the mapping {hellip: ...} would
+output the standard ASCII representation of an ellipsis.
+
+The available typographical symbol names are:
+
+* hellip: ellipsis
+* mdash: em-dash
+* ndash: en-dash
+* laquo: left guillemet
+* raquo: right guillemet
+* laquo_space: left guillemet followed by a space
+* raquo_space: right guillemet preceeded by a space
+
+Default: {}
+Used by: HTML/Latex converter
+EOF
+      val = simple_hash_validator(val, :typographic_symbols)
+      val.keys.each do |k|
+        val[k.kind_of?(String) ? str_to_sym(k) : k] = val.delete(k).to_s
+      end
+      val
+    end
+
     define(:remove_block_html_tags, Boolean, true, <<EOF)
 Remove block HTML tags
 
@@ -593,6 +624,22 @@ Default: '&8617;'
 Used by: HTML converter
 EOF
 
+    define(:footnote_backlink_inline, Boolean, false, <<EOF)
+Specifies whether the footnote backlink should always be inline
+
+With the default of false the footnote backlink is placed at the end of
+the last paragraph if there is one, or an extra paragraph with only the
+footnote backlink is created.
+
+Setting this option to true tries to place the footnote backlink in the
+last, possibly nested paragraph or header. If this fails (e.g. in the
+case of a table), an extra paragraph with only the footnote backlink is
+created.
+
+Default: false
+Used by: HTML converter
+EOF
+
     define(:gfm_quirks, Object, [:paragraph_end], <<EOF) do |val|
 Enables a set of GFM specific quirks
 
@@ -613,6 +660,13 @@ separated by commas. Possible names are:
 
   Note that if this quirk is used, lazy line wrapping does not fully
   work anymore!
+
+* no_auto_typographic
+
+  Disables automatic conversion of some characters into their
+  corresponding typographic symbols (like `--` to em-dash etc).
+  This helps to achieve results closer to what GitHub Flavored
+  Markdown produces.
 
 Default: paragraph_end
 Used by: GFM parser

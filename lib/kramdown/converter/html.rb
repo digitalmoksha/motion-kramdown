@@ -305,7 +305,11 @@ module Kramdown
         :raquo => [::Kramdown::Utils::Entities.entity('raquo')]
       } # :nodoc:
       def convert_typographic_sym(el, indent)
-        TYPOGRAPHIC_SYMS[el.value].map {|e| entity_to_str(e)}.join('')
+        if (result = @options[:typographic_symbols][el.value])
+          escape_html(result, :text)
+        else
+          TYPOGRAPHIC_SYMS[el.value].map {|e| entity_to_str(e)}.join('')
+        end
       end
 
       def convert_smart_quote(el, indent)
@@ -459,16 +463,17 @@ module Kramdown
           li = Element.new(:li, nil, {'id' => "fn:#{name}"})
           li.children = Marshal.load(Marshal.dump(data.children))
 
-          #------------------------------------------------------------------------------
-          # RM Crash due to an object being autoreleased one too many times in RubyMotion.
-          # pre-initializing `para` before it's assigned in the `if` statement seems to
-          # fix it.
           para = nil
-
-          if li.children.last.type == :p
-            para = li.children.last
+          if li.children.last.type == :p || @options[:footnote_backlink_inline]
+            parent = li
+            while !parent.children.empty? && ![:p, :header].include?(parent.children.last.type)
+              parent = parent.children.last
+            end
+            para = parent.children.last
             insert_space = true
-          else
+          end
+
+          unless para
             li.children << (para = Element.new(:p))
             insert_space = false
           end

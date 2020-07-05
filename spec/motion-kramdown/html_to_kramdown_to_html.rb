@@ -45,6 +45,11 @@ describe "html-to-kramdown-to-html conversion" do
       'test/testcases/span/04_footnote/footnote_nr.html',               # bc of issue with nbsp
       'test/testcases/span/04_footnote/inside_footnote.html',           # bc of issue with nbsp
       'test/testcases/span/04_footnote/backlink_text.html',             # bc of issue with nbsp
+
+      'test/testcases/span/math/sskatex.html',                          # bc of tidy
+      'test/testcases/block/15_math/sskatex.html',                      # bc of tidy
+
+      'test/testcases/span/04_footnote/backlink_inline.html',           # bc no math support yet
     ].compact
 
     Dir["#{focus_files(testcase_dir)}.{html,html.19}"].each do |html_file|

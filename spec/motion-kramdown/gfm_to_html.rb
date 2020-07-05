@@ -1,9 +1,24 @@
 describe "gfm-to-html conversion" do
 
+  MATHJAX_NODE_AVAILABLE = begin
+                             require 'kramdown/converter/math_engine/mathjaxnode'
+                             Kramdown::Converter::MathEngine::MathjaxNode::AVAILABLE or
+                               warn("Skipping MathjaxNode tests as MathjaxNode is not available")
+                           end
+
+  KATEX_AVAILABLE = begin
+                      / class="katex"/ === Kramdown::Document.
+                        new('$$a$$', {:math_engine => :sskatex}).to_html or
+                        warn("Skipping SsKaTeX tests as SsKaTeX is not available.")
+                    rescue
+                      warn("Skipping SsKaTeX tests as default SsKaTeX config does not work.")
+                    end or warn("Run \"rake dev:test_sskatex_deps\" to see why.")
+
   EXCLUDE_GFM_FILES = [
    'test/testcases/block/03_paragraph/no_newline_at_end.text',
    'test/testcases/block/03_paragraph/indented.text',
    'test/testcases/block/03_paragraph/two_para.text',
+   'test/testcases/block/03_paragraph/line_break_last_line.text',
    'test/testcases/block/04_header/atx_header.text',
    'test/testcases/block/04_header/setext_header.text',
    'test/testcases/block/04_header/with_auto_ids.text', # bc of ID generation difference
@@ -88,6 +103,11 @@ describe "gfm-to-html conversion" do
 
    'test/testcases_gfm/backticks_syntax.text',                   # bc no highlight support yet
    'test/testcases_gfm/header_ids.text',                         # bc no math support yet
+
+   ('test/testcases/block/15_math/sskatex.text' unless KATEX_AVAILABLE),
+   ('test/testcases/span/math/sskatex.text' unless KATEX_AVAILABLE),
+
+   'test/testcases/span/04_footnote/backlink_inline.text',       # bc no math support yet
   ].compact
 
   ['testcases', 'testcases_gfm'].each do |item|

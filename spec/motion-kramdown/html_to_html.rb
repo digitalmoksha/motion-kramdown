@@ -35,6 +35,11 @@ describe "html-to-{html,kramdown} conversion" do
       'test/testcases/span/04_footnote/inside_footnote.html',      # bc of issue with nbsp
       'test/testcases/span/04_footnote/backlink_text.html',        # bc of issue with nbsp
       'test/testcases/span/abbreviations/in_footnote.html',        # bc of issue with nbsp
+
+      'test/testcases/span/math/sskatex.html',                     # bc of tidy
+      'test/testcases/block/15_math/sskatex.html',                 # bc of tidy
+
+      'test/testcases/span/04_footnote/backlink_inline.html',      # bc no math support yet
     ].compact
 
     EXCLUDE_HTML_TEXT_FILES = ['test/testcases/block/09_html/parse_as_span.htmlinput',
