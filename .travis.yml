@@ -1,5 +1,5 @@
 language: objective-c
-osx_image: xcode11.3
+osx_image: xcode11.5
 env:
   global:
     - RUBYMOTION_LICENSE=1dcac45cc434293009f74b33037bdf7361a3a1ff # Official license key for open-source projects
@@ -26,4 +26,9 @@ before_install:
 gemfile:
   - Gemfile
 
-script: bundle exec rake spec
+jobs:
+  include:
+    - stage: macos
+      script: bundle exec rake spec
+    - stage: ios
+      script: bundle exec rake spec platform=ios

@@ -20,5 +20,5 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'motion-strscan', '~> 0.5'
   gem.add_dependency 'motion-yaml', '~> 1.4'
 
-  gem.add_development_dependency 'bacon-expect', '~> 1.0' # required for Travis build to work
+  gem.add_development_dependency 'motion-expect', '~> 2.0' # required for Travis build to work
 end
