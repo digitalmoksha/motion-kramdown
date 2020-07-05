@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2016 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
@@ -128,8 +128,11 @@ module Kramdown
       ALD_ID_CHARS = /[\w-]/
       ALD_ANY_CHARS = /\\\}|[^\}]/
       ALD_ID_NAME = /\w#{ALD_ID_CHARS}*/
-      ALD_TYPE_KEY_VALUE_PAIR = /(#{ALD_ID_NAME})=("|')((?:\\\}|\\\2|[^\}\2])*?)\2/
-      ALD_TYPE_CLASS_NAME = /\.(-?#{ALD_ID_NAME})/
+      ALD_CLASS_NAME = /[^\s\.#]+/
+      # RM I don't know why the original has an extra `\2` in it, but a test no
+      # longer passes with.  Removed, and all specs pass
+      ALD_TYPE_KEY_VALUE_PAIR = /(#{ALD_ID_NAME})=("|')((?:\\\}|\\\2|[^\}])*?)\2/ # RM
+      ALD_TYPE_CLASS_NAME = /\.(#{ALD_CLASS_NAME})/
       ALD_TYPE_ID_NAME = /#([A-Za-z][\w:-]*)/
       ALD_TYPE_ID_OR_CLASS = /#{ALD_TYPE_ID_NAME}|#{ALD_TYPE_CLASS_NAME}/
       ALD_TYPE_ID_OR_CLASS_MULTI = /((?:#{ALD_TYPE_ID_NAME}|#{ALD_TYPE_CLASS_NAME})+)/

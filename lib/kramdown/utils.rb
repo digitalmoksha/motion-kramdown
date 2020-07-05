@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2016 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
@@ -21,6 +21,7 @@ module Kramdown
     # RM autoload :Unidecoder, 'kramdown/utils/unidecoder'
     # RM autoload :StringScanner, 'kramdown/utils/string_scanner'
     # RM autoload :Configurable, 'kramdown/utils/configurable'
+    # RM autoload :LRUCache, 'kramdown/utils/lru_cache'
 
     # Treat +name+ as if it were snake cased (e.g. snake_case) and camelize it (e.g. SnakeCase).
     def self.camelize(name)

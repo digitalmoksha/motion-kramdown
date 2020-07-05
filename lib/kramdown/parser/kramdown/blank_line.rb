@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2016 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
@@ -11,7 +11,7 @@ module Kramdown
   module Parser
     class Kramdown
 
-      BLANK_LINE = /(?:^\s*\n)+/m     # RM Oniguruma -> ICU
+      BLANK_LINE = /(?>^\s*\n)+/m     # RM Oniguruma -> ICU
 
       # Parse the blank line at the current postition.
       def parse_blank_line

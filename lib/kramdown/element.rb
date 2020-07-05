@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2016 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
@@ -97,6 +97,10 @@ module Kramdown
   # Represents a code block, i.e. a block of text that should be used as-is.
   #
   # The +value+ field has to contain the content of the code block.
+  #
+  # The option :lang specifies a highlighting language with possible HTML style options (e.g.
+  # php?start_inline=1) and should be used instead of a possibly also available language embedded in
+  # a class name of the form 'language-LANG'.
   #
   #
   # === :ul

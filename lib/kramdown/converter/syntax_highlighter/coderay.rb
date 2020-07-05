@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2016 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
@@ -13,7 +13,7 @@ module Kramdown::Converter::SyntaxHighlighter
   module Coderay
 
     begin
-      # RM require 'coderay'
+      require 'coderay'
 
       # Highlighting via coderay is available if this constant is +true+.
       # RM AVAILABLE = true
@@ -21,17 +21,20 @@ module Kramdown::Converter::SyntaxHighlighter
       AVAILABLE = false  # :nodoc:
     end
 
-    def self.call(converter, text, lang, type, _unused_opts)
+    def self.call(converter, text, lang, type, call_opts)
       return nil unless converter.options[:enable_coderay]
 
       if type == :span && lang
         ::CodeRay.scan(text, lang.to_sym).html(options(converter, :span)).chomp
       elsif type == :block && (lang || options(converter, :default_lang))
-        lang = (lang || options(converter, :default_lang)).to_sym
-        ::CodeRay.scan(text, lang).html(options(converter, :block)).chomp << "\n"
+        lang ||= call_opts[:default_lang] = options(converter, :default_lang)
+        ::CodeRay.scan(text, lang.to_s.gsub(/-/, '_').to_sym).html(options(converter, :block)).chomp << "\n"
       else
         nil
       end
+    rescue
+      converter.warning("There was an error using CodeRay: #{$!.message}")
+      nil
     end
 
     def self.options(converter, type)

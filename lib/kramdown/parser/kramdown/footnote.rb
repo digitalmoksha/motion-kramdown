@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2016 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
 #
 
-# RM require 'kramdown/parser/kramdown/extensions'
-# RM require 'kramdown/parser/kramdown/blank_line'
-# RM require 'kramdown/parser/kramdown/codeblock'
+require 'kramdown/parser/kramdown/extensions'
+require 'kramdown/parser/kramdown/blank_line'
+require 'kramdown/parser/kramdown/codeblock'
 
 module Kramdown
   module Parser
@@ -61,4 +61,3 @@ module Kramdown
     end
   end
 end
-

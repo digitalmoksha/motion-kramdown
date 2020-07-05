@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2016 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
 #
 
-# RM require 'kramdown/parser/kramdown/blank_line'
-# RM require 'kramdown/parser/kramdown/extensions'
-# RM require 'kramdown/parser/kramdown/eob'
-# RM require 'kramdown/parser/kramdown/list'
-# RM require 'kramdown/parser/kramdown/html'
+require 'kramdown/parser/kramdown/blank_line'
+require 'kramdown/parser/kramdown/extensions'
+require 'kramdown/parser/kramdown/eob'
+require 'kramdown/parser/kramdown/list'
+require 'kramdown/parser/kramdown/html'
 
 module Kramdown
   module Parser
@@ -32,14 +32,21 @@ module Kramdown
 
       # Parse the paragraph at the current location.
       def parse_paragraph
+        pos = @src.pos
         start_line_number = @src.current_line_number
         result = @src.scan(PARAGRAPH_MATCH)
-        while !@src.match?(self.class::PARAGRAPH_END)
+        while !@src.match?(paragraph_end)
           result << @src.scan(PARAGRAPH_MATCH)
         end
         result.rstrip!
         if @tree.children.last && @tree.children.last.type == :p
-          @tree.children.last.children.first.value << "\n" << result
+          last_item_in_para = @tree.children.last.children.last
+          if last_item_in_para && last_item_in_para.type == @text_type
+            joiner = (extract_string((pos - 3)...pos, @src) == "  \n" ? "  \n" : "\n")
+            last_item_in_para.value << joiner << result
+          else
+            add_text(result, @tree.children.last)
+          end
         else
           @tree.children << new_block_el(:p, nil, nil, :location => start_line_number)
           result.lstrip!
@@ -48,6 +55,10 @@ module Kramdown
         true
       end
       define_parser(:paragraph, PARAGRAPH_START)
+
+      def paragraph_end
+        self.class::PARAGRAPH_END
+      end
 
     end
   end

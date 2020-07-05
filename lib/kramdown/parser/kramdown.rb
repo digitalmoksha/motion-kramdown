@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2016 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
 #
 
-# RM require 'strscan'
-# RM require 'stringio'
-# RM require 'kramdown/parser'
+require 'strscan'
+require 'stringio'
+require 'kramdown/parser'
 
 #TODO: use [[:alpha:]] in all regexp to allow parsing of international values in 1.9.1
 #NOTE: use @src.pre_match only before other check/match?/... operations, otherwise the content is changed
@@ -90,7 +90,15 @@ module Kramdown
         update_tree(@root)
         correct_abbreviations_attributes
         replace_abbreviations(@root)
-        @footnotes.each {|name,data| update_tree(data[:content])}
+        @footnotes.each do |name,data|
+          update_tree(data[:content])
+          replace_abbreviations(data[:content])
+        end
+        @footnotes.each do |name, data|
+          next if data.key?(:marker)
+          line = data[:content].options[:location]
+          warning("Footnote definition for '#{name}' on line #{line} is unreferenced - ignoring")
+        end
       end
 
       #######
@@ -178,7 +186,11 @@ module Kramdown
             last_blank = nil
             update_tree(child)
             update_attr_with_ial(child.attr, child.options[:ial]) if child.options[:ial]
-            update_raw_header_text(child) if child.type == :header
+            # DEPRECATED: option auto_id_stripping will be removed in 2.0 because then this will be
+            # the default behaviour
+            if child.type == :dt || (child.type == :header && @options[:auto_id_stripping])
+              update_raw_text(child)
+            end
             child
           end
         end.flatten!
@@ -267,11 +279,8 @@ module Kramdown
         end
       end
 
-      # Update the raw header text for automatic ID generation.
-      def update_raw_header_text(header)
-        # DEPRECATED: option auto_id_stripping will be removed in 2.0 because then this will be the
-        # default behaviour
-        return unless @options[:auto_id_stripping]
+      # Update the raw text for automatic ID generation.
+      def update_raw_text(item)
         raw_text = ''
 
         append_text = lambda do |child|
@@ -282,8 +291,8 @@ module Kramdown
           end
         end
 
-        append_text.call(header)
-        header.options[:raw_text] = raw_text
+        append_text.call(item)
+        item.options[:raw_text] = raw_text
       end
 
       # Create a new block-level element, taking care of applying a preceding block IAL if it
@@ -331,29 +340,29 @@ module Kramdown
       # Regexp for matching the optional space (zero or up to three spaces)
       OPT_SPACE = / {0,3}/
 
-      # RM require 'kramdown/parser/kramdown/blank_line'
-      # RM require 'kramdown/parser/kramdown/eob'
-      # RM require 'kramdown/parser/kramdown/paragraph'
-      # RM require 'kramdown/parser/kramdown/header'
-      # RM require 'kramdown/parser/kramdown/blockquote'
-      # RM require 'kramdown/parser/kramdown/table'
-      # RM require 'kramdown/parser/kramdown/codeblock'
-      # RM require 'kramdown/parser/kramdown/horizontal_rule'
-      # RM require 'kramdown/parser/kramdown/list'
-      # RM require 'kramdown/parser/kramdown/link'
-      # RM require 'kramdown/parser/kramdown/extensions'
-      # RM require 'kramdown/parser/kramdown/footnote'
-      # RM require 'kramdown/parser/kramdown/html'
-      # RM require 'kramdown/parser/kramdown/escaped_chars'
-      # RM require 'kramdown/parser/kramdown/html_entity'
-      # RM require 'kramdown/parser/kramdown/line_break'
-      # RM require 'kramdown/parser/kramdown/typographic_symbol'
-      # RM require 'kramdown/parser/kramdown/autolink'
-      # RM require 'kramdown/parser/kramdown/codespan'
-      # RM require 'kramdown/parser/kramdown/emphasis'
-      # RM require 'kramdown/parser/kramdown/smart_quotes'
-      # RM require 'kramdown/parser/kramdown/math'
-      # RM require 'kramdown/parser/kramdown/abbreviation'
+      require 'kramdown/parser/kramdown/blank_line'
+      require 'kramdown/parser/kramdown/eob'
+      require 'kramdown/parser/kramdown/paragraph'
+      require 'kramdown/parser/kramdown/header'
+      require 'kramdown/parser/kramdown/blockquote'
+      require 'kramdown/parser/kramdown/table'
+      require 'kramdown/parser/kramdown/codeblock'
+      require 'kramdown/parser/kramdown/horizontal_rule'
+      require 'kramdown/parser/kramdown/list'
+      require 'kramdown/parser/kramdown/link'
+      require 'kramdown/parser/kramdown/extensions'
+      require 'kramdown/parser/kramdown/footnote'
+      require 'kramdown/parser/kramdown/html'
+      require 'kramdown/parser/kramdown/escaped_chars'
+      require 'kramdown/parser/kramdown/html_entity'
+      require 'kramdown/parser/kramdown/line_break'
+      require 'kramdown/parser/kramdown/typographic_symbol'
+      require 'kramdown/parser/kramdown/autolink'
+      require 'kramdown/parser/kramdown/codespan'
+      require 'kramdown/parser/kramdown/emphasis'
+      require 'kramdown/parser/kramdown/smart_quotes'
+      require 'kramdown/parser/kramdown/math'
+      require 'kramdown/parser/kramdown/abbreviation'
 
     end
 

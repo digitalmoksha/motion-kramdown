@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2016 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
 #
 
-# RM require 'kramdown/parser/kramdown/blank_line'
-# RM require 'kramdown/parser/kramdown/eob'
-# RM require 'kramdown/parser/kramdown/horizontal_rule'
-# RM require 'kramdown/parser/kramdown/extensions'
+require 'kramdown/parser/kramdown/blank_line'
+require 'kramdown/parser/kramdown/eob'
+require 'kramdown/parser/kramdown/horizontal_rule'
+require 'kramdown/parser/kramdown/extensions'
 
 module Kramdown
   module Parser
@@ -39,7 +39,7 @@ module Kramdown
           end
           indentation += content[/^ */].length
         end
-        content = content.sub(/^\s*/, '')
+        content.sub!(/^\s*/, '')
 
         # [content, indentation, *PARSE_FIRST_LIST_LINE_REGEXP_CACHE[indentation]]  # RM use caching code below
 
@@ -90,7 +90,7 @@ module Kramdown
             list.children << item
 
             #------------------------------------------------------------------------------
-            # RM don't know why, but using the item.options[:ial] directly in the block 
+            # RM don't know why, but using the item.options[:ial] directly in the block
             # caused an object to be autoreleased one too many times in RubyMotion,
             # crashing the app. So use this workaround
             item_options = (item.options[:ial] ||= {}) # RM
@@ -107,10 +107,12 @@ module Kramdown
             item.value = [item.value]
           elsif (result = @src.scan(content_re)) || (!last_is_blank && (result = @src.scan(lazy_re)))
             result.sub!(/^(\t+)/) { " " * 4 * $1.length }
-            result.sub!(indent_re, '')
-            if !nested_list_found && result =~ LIST_START
+            indentation_found = result.sub!(indent_re, '')
+            if !nested_list_found && indentation_found && result =~ LIST_START
               item.value << ''
               nested_list_found = true
+            elsif nested_list_found && !indentation_found && result =~ LIST_START
+              result = " " * (indentation + 4) << result
             end
             item.value.last << result
             last_is_blank = false
@@ -189,6 +191,11 @@ module Kramdown
         deflist.options[:location] = para.options[:location] # take location from preceding para which is the first definition term
         para.children.first.value.split(/\n/).each do |term|
           el = Element.new(:dt, nil, nil, :location => @src.current_line_number)
+          term.sub!(self.class::LIST_ITEM_IAL) do
+            parse_attribute_list($1, el.options[:ial] ||= {})
+            ''
+          end
+          el.options[:raw_text] = term
           el.children << Element.new(:raw_text, term)
           deflist.children << el
         end
@@ -207,7 +214,7 @@ module Kramdown
             deflist.children << item
 
             #------------------------------------------------------------------------------
-            # RM don't know why, but using the item.options[:ial] directly in the block 
+            # RM don't know why, but using the item.options[:ial] directly in the block
             # caused an object to be autoreleased one too many times in RubyMotion,
             # crashing the app. So use this workaround
             item_options = (item.options[:ial] ||= {}) # RM

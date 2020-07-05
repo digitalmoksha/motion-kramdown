@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2016 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
 #
 
-# RM equire 'yaml'
+require 'yaml'
 
 module Kramdown
 
@@ -133,14 +133,14 @@ module Kramdown
     # - a comma separated string which is split into an array of values
     # - or an array.
     #
-    # Additionally, the array is checked for the correct size.
-    def self.simple_array_validator(val, name, size)
+    # Optionally, the array is checked for the correct size.
+    def self.simple_array_validator(val, name, size = nil)
       if String === val
         val = val.split(/,/)
       elsif !(Array === val)
         raise Kramdown::Error, "Invalid type #{val.class} for option #{name}"
       end
-      if val.size != size
+      if size && val.size != size
         raise Kramdown::Error, "Option #{name} needs exactly #{size} values"
       end
       val
@@ -473,6 +473,37 @@ EOF
       val
     end
 
+    define(:typographic_symbols, Object, {}, <<EOF) do |val|
+Defines a mapping from typographical symbol to output characters
+
+Typographical symbols are normally output using their equivalent Unicode
+codepoint. However, sometimes one wants to change the output, mostly to
+fallback to a sequence of ASCII characters.
+
+This option allows this by specifying a mapping from typographical
+symbol to its output string. For example, the mapping {hellip: ...} would
+output the standard ASCII representation of an ellipsis.
+
+The available typographical symbol names are:
+
+* hellip: ellipsis
+* mdash: em-dash
+* ndash: en-dash
+* laquo: left guillemet
+* raquo: right guillemet
+* laquo_space: left guillemet followed by a space
+* raquo_space: right guillemet preceeded by a space
+
+Default: {}
+Used by: HTML/Latex converter
+EOF
+      val = simple_hash_validator(val, :typographic_symbols)
+      val.keys.each do |k|
+        val[k.kind_of?(String) ? str_to_sym(k) : k] = val.delete(k).to_s
+      end
+      val
+    end
+
     define(:remove_block_html_tags, Boolean, true, <<EOF)
 Remove block HTML tags
 
@@ -525,7 +556,7 @@ Options for the syntax highlighter can be set with the
 syntax_highlighter_opts configuration option.
 
 Default: coderay
-Used by: HTML converter
+Used by: HTML/Latex converter
 EOF
 
     define(:syntax_highlighter_opts, Object, {}, <<EOF) do |val|
@@ -538,7 +569,7 @@ The value needs to be a hash with key-value pairs that are understood by
 the used syntax highlighter.
 
 Default: {}
-Used by: HTML converter
+Used by: HTML/Latex converter
 EOF
       val = simple_hash_validator(val, :syntax_highlighter_opts)
       val.keys.each do |k|
@@ -577,6 +608,71 @@ EOF
       val.keys.each do |k|
         val[k.kind_of?(String) ? str_to_sym(k) : k] = val.delete(k)
       end
+      val
+    end
+
+    define(:footnote_backlink, String, '&#8617;', <<EOF)
+Defines the text that should be used for the footnote backlinks
+
+The footnote backlink is just text, so any special HTML characters will
+be escaped.
+
+If the footnote backlint text is an empty string, no footnote backlinks
+will be generated.
+
+Default: '&8617;'
+Used by: HTML converter
+EOF
+
+    define(:footnote_backlink_inline, Boolean, false, <<EOF)
+Specifies whether the footnote backlink should always be inline
+
+With the default of false the footnote backlink is placed at the end of
+the last paragraph if there is one, or an extra paragraph with only the
+footnote backlink is created.
+
+Setting this option to true tries to place the footnote backlink in the
+last, possibly nested paragraph or header. If this fails (e.g. in the
+case of a table), an extra paragraph with only the footnote backlink is
+created.
+
+Default: false
+Used by: HTML converter
+EOF
+
+    define(:gfm_quirks, Object, [:paragraph_end], <<EOF) do |val|
+Enables a set of GFM specific quirks
+
+The way how GFM is transformed on Github often differs from the way
+kramdown does things. Many of these differences are negligible but
+others are not.
+
+This option allows one to enable/disable certain GFM quirks, i.e. ways
+in which GFM parsing differs from kramdown parsing.
+
+The value has to be a list of quirk names that should be enabled,
+separated by commas. Possible names are:
+
+* paragraph_end
+
+  Disables the kramdown restriction that at least one blank line has to
+  be used after a paragraph before a new block element can be started.
+
+  Note that if this quirk is used, lazy line wrapping does not fully
+  work anymore!
+
+* no_auto_typographic
+
+  Disables automatic conversion of some characters into their
+  corresponding typographic symbols (like `--` to em-dash etc).
+  This helps to achieve results closer to what GitHub Flavored
+  Markdown produces.
+
+Default: paragraph_end
+Used by: GFM parser
+EOF
+      val = simple_array_validator(val, :gfm_quirks)
+      val.map! {|v| str_to_sym(v.to_s)}
       val
     end
 

@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2016 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
 #
 
-# RM require 'kramdown/parser/kramdown/block_boundary'
+require 'kramdown/parser/kramdown/block_boundary'
 
 module Kramdown
   module Parser
     class Kramdown
 
-      TABLE_SEP_LINE = /^([+|: -]*?-[+|: -]*?)[ \t]*\n/
-      TABLE_HSEP_ALIGN = /[ ]?(:?)-+(:?)[ ]?/
-      TABLE_FSEP_LINE = /^[+|: =]*?=[+|: =]*?[ \t]*\n/
+      TABLE_SEP_LINE = /^([+|: \t-]*?-[+|: \t-]*?)[ \t]*\n/
+      TABLE_HSEP_ALIGN = /[ \t]?(:?)-+(:?)[ \t]?/
+      TABLE_FSEP_LINE = /^[+|: \t=]*?=[+|: \t=]*?[ \t]*\n/
       TABLE_ROW_LINE = /^(.*?)[ \t]*\n/
       TABLE_PIPE_CHECK = /(?:\||.*?[^\\\n]\|)/
       TABLE_LINE = /#{TABLE_PIPE_CHECK}.*?\n/
@@ -45,8 +45,10 @@ module Kramdown
 
         while !@src.eos?
           break if !@src.check(TABLE_LINE)
-          if @src.scan(TABLE_SEP_LINE) && !rows.empty?
-            if table.options[:alignment].empty? && !has_footer
+          if @src.scan(TABLE_SEP_LINE)
+            if rows.empty?
+              # nothing to do, ignoring multiple consecutive separator lines
+            elsif table.options[:alignment].empty? && !has_footer
               add_container.call(:thead, false)
               table.options[:alignment] = @src[1].scan(TABLE_HSEP_ALIGN).map do |left, right|
                 (left.empty? && right.empty? && :default) || (right.empty? && :left) || (left.empty? && :right) || :center
@@ -73,11 +75,7 @@ module Kramdown
 
                 root.children.each do |c|
                   if c.type == :raw_text
-                    # Only on Ruby 1.9: f, *l = c.value.split(/(?<!\\)\|/).map {|t| t.gsub(/\\\|/, '|')}
-                    f, *l = c.value.split(/\\\|/, -1).map {|t| t.split(/\|/, -1)}.inject([]) do |memo, t|
-                      memo.last << "|#{t.shift}" if memo.size > 0
-                      memo.concat(t)
-                    end
+                    f, *l = c.value.split(/(?<!\\)\|/, -1).map {|t| t.gsub(/\\\|/, '|')}
                     (cells.empty? ? cells : cells.last) << f
                     cells.concat(l)
                   else

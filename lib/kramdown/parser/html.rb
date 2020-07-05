@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2016 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
 #
 
-# RM require 'rexml/parsers/baseparser'
-# RM require 'strscan'
-# RM require 'kramdown/utils'
-# RM require 'kramdown/parser'
+require 'rexml/parsers/baseparser'
+require 'strscan'
+require 'kramdown/utils'
+require 'kramdown/parser'
 
 module Kramdown
 
@@ -35,8 +35,8 @@ module Kramdown
         HTML_ENTITY_RE = /&([\w:][\-\w\.:]*);|&#(\d+);|&\#x([0-9a-fA-F]+);/
 
         HTML_CONTENT_MODEL_BLOCK = %w{address applet article aside blockquote body
-             dd details div dl fieldset figure figcaption footer form header hgroup iframe li map menu nav
-              noscript object section summary td}
+             dd details div dl fieldset figure figcaption footer form header hgroup iframe li main
+             map menu nav noscript object section summary td}
         HTML_CONTENT_MODEL_SPAN  = %w{a abbr acronym b bdo big button cite caption del dfn dt em
              h1 h2 h3 h4 h5 h6 i ins label legend optgroup p q rb rbc
              rp rt rtc ruby select small span strong sub sup th tt}
@@ -53,12 +53,18 @@ module Kramdown
         # span HTML) and don't appear therefore!
         # script, textarea
         HTML_SPAN_ELEMENTS = %w{a abbr acronym b big bdo br button cite code del dfn em i img input
-                              ins kbd label option q rb rbc rp rt rtc ruby samp select small span
+                              ins kbd label mark option q rb rbc rp rt rtc ruby samp select small span
                               strong sub sup tt u var}
         HTML_BLOCK_ELEMENTS = %w{address article aside applet body blockquote caption col colgroup dd div dl dt fieldset
                                figcaption footer form h1 h2 h3 h4 h5 h6 header hgroup hr html head iframe legend menu
-                               li map nav ol optgroup p pre section summary table tbody td th thead tfoot tr ul}
+                               li main map nav ol optgroup p pre section summary table tbody td th thead tfoot tr ul}
         HTML_ELEMENTS_WITHOUT_BODY = %w{area base br col command embed hr img input keygen link meta param source track wbr}
+
+        HTML_ELEMENT = Hash.new(false)
+        (HTML_SPAN_ELEMENTS + HTML_BLOCK_ELEMENTS + HTML_ELEMENTS_WITHOUT_BODY +
+         HTML_CONTENT_MODEL.keys).each do |a|
+          HTML_ELEMENT[a] = true
+        end
       end
 
 
@@ -77,16 +83,16 @@ module Kramdown
         # element is already closed, ie. contains no body; the third parameter specifies whether the
         # body - and the end tag - need to be handled in case closed=false).
         def handle_html_start_tag(line = nil) # :yields: el, closed, handle_body
-          name = @src[1].downcase
+          name = @src[1]
+          name.downcase! if HTML_ELEMENT[name.downcase]
           closed = !@src[4].nil?
-          attrs = parse_html_attributes(@src[2], line)
+          attrs = parse_html_attributes(@src[2], line, HTML_ELEMENT[name])
 
           el = Element.new(:html_element, name, attrs, :category => :block)
           el.options[:location] = line if line
           @tree.children << el
 
           if !closed && HTML_ELEMENTS_WITHOUT_BODY.include?(el.value)
-            warning("The HTML tag '#{el.value}' on line #{line} cannot have any content - auto-closing it")
             closed = true
           end
           if name == 'script' || name == 'style'
@@ -100,10 +106,13 @@ module Kramdown
         # Parses the given string for HTML attributes and returns the resulting hash.
         #
         # If the optional +line+ parameter is supplied, it is used in warning messages.
-        def parse_html_attributes(str, line = nil)
+        #
+        # If the optional +in_html_tag+ parameter is set to +false+, attributes are not modified to
+        # contain only lowercase letters.
+        def parse_html_attributes(str, line = nil, in_html_tag = true)
           attrs = Utils::OrderedHash.new
           str.scan(HTML_ATTRIBUTE_RE).each do |attr, sep, val|
-            attr.downcase!
+            attr.downcase! if in_html_tag
             if attrs.has_key?(attr)
               warning("Duplicate HTML attribute '#{attr}' on line #{line || '?'} - overwriting previous one")
             end
@@ -150,16 +159,17 @@ module Kramdown
               elsif result = @src.scan(HTML_INSTRUCTION_RE)
                 @tree.children << Element.new(:xml_pi, result, nil, :category => :block, :location => line)
               elsif @src.scan(HTML_TAG_RE)
-                if method(:handle_html_start_tag).arity == 1
+                if method(:handle_html_start_tag).arity.abs >= 1
                   handle_html_start_tag(line, &block)
                 else
                   handle_html_start_tag(&block) # DEPRECATED: method needs to accept line number in 2.0
                 end
               elsif @src.scan(HTML_TAG_CLOSE_RE)
-                if @tree.value == @src[1].downcase
+                if @tree.value == (HTML_ELEMENT[@tree.value] ? @src[1].downcase : @src[1])
                   done = true
                 else
-                  warning("Found invalidly used HTML closing tag for '#{@src[1].downcase}' on line #{line} - ignoring it")
+                  add_text(@src.matched, @tree, :text)
+                  warning("Found invalidly used HTML closing tag for '#{@src[1]}' on line #{line} - ignoring it")
                 end
               else
                 add_text(@src.getch, @tree, :text)
@@ -422,7 +432,7 @@ module Kramdown
             else
               set_basics(el, :codeblock)
               if el.children.size == 1 && el.children.first.value == 'code'
-                value = (el.children.first.attr['class'] || '').scan(/\blanguage-\w+\b/).first
+                value = (el.children.first.attr['class'] || '').scan(/\blanguage-\S+/).first
                 el.attr['class'] = "#{value} #{el.attr['class']}".rstrip if value
               end
             end

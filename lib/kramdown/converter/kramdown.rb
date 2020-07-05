@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2016 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
 #
 
-# RM require 'kramdown/converter'
-# RM require 'kramdown/utils'
+require 'kramdown/converter'
+require 'kramdown/utils'
 
 module Kramdown
 
@@ -31,7 +31,7 @@ module Kramdown
 
       def convert(el, opts = {:indent => 0})
         res = send("convert_#{el.type}", el, opts)
-        if ![:html_element, :li, :dd, :td].include?(el.type) && (ial = ial_for_element(el))
+        if ![:html_element, :li, :dt, :dd, :td].include?(el.type) && (ial = ial_for_element(el))
           res << ial
           res << "\n\n" if Element.category(el) == :block
         elsif [:ul, :dl, :ol, :codeblock].include?(el.type) && opts[:next] &&
@@ -174,7 +174,11 @@ module Kramdown
       end
 
       def convert_dt(el, opts)
-        inner(el, opts) << "\n"
+        result = ''
+        if ial = ial_for_element(el)
+          result << ial << " "
+        end
+        result << inner(el, opts) << "\n"
       end
 
       HTML_TAGS_WITH_BODY=['div', 'script', 'iframe', 'textarea']
@@ -288,14 +292,15 @@ module Kramdown
 
       def convert_img(el, opts)
         alt_text = el.attr['alt'].to_s.gsub(ESCAPED_CHAR_RE) { $1 ? "\\#{$1}" : $2 }
-        if el.attr['src'].empty?
+        src = el.attr['src'].to_s
+        if src.empty?
           "![#{alt_text}]()"
         else
           title = parse_title(el.attr['title'])
-          link = if el.attr['src'].count("()") > 0
-                   "<#{el.attr['src']}>"
+          link = if src.count("()") > 0
+                   "<#{src}>"
                  else
-                   el.attr['src']
+                   src
                  end
           "![#{alt_text}](#{link}#{title})"
         end
@@ -402,7 +407,7 @@ module Kramdown
           next if el.type == :header && k == 'id' && !v.strip.empty?
           if v.nil?
             ''
-          elsif k == 'class' && !v.empty?
+          elsif k == 'class' && !v.empty? && !v.index(/[\.#]/)
             " " + v.split(/\s+/).map {|w| ".#{w}"}.join(" ")
           elsif k == 'id' && !v.strip.empty?
             " ##{v}"
@@ -414,6 +419,10 @@ module Kramdown
           (el.options[:ial] && (el.options[:ial][:refs] || []).include?('toc'))  # RM can't use rescue nil
         res = "footnotes" << (res.strip.empty? ? '' : " #{res}") if (el.type == :ul || el.type == :ol) &&
           (el.options[:ial] && (el.options[:ial][:refs] || []).include?('footnotes')) # RM can't use rescue nil
+        if el.type == :dl && el.options[:ial] && el.options[:ial][:refs]
+          auto_ids = el.options[:ial][:refs].select {|ref| ref =~ /\Aauto_ids/}.join(" ")
+          res = auto_ids << (res.strip.empty? ? '' : " #{res}") unless auto_ids.empty?
+        end
         res.strip.empty? ? nil : "{:#{res}}"
       end
 

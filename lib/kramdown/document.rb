@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2016 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
@@ -29,31 +29,28 @@
 #
 #     Kramdown::Document.new(text).to_html
 #
-# For detailed information have a look at the Kramdown::Document class.
+# For detailed information have a look at the *\Kramdown::Document* class.
 #
 # == License
 #
 # MIT - see the COPYING file.
 
-
-# RM require 'kramdown/compatibility'
-#
-# RM require 'kramdown/version'
-# RM require 'kramdown/element'
-# RM require 'kramdown/error'
-# RM require 'kramdown/parser'
-# RM require 'kramdown/converter'
-# RM require 'kramdown/options'
-# RM require 'kramdown/utils'
+require 'kramdown/version'
+require 'kramdown/element'
+require 'kramdown/error'
+require 'kramdown/parser'
+require 'kramdown/converter'
+require 'kramdown/options'
+require 'kramdown/utils'
 
 module Kramdown
 
   # Return the data directory for kramdown.
   def self.data_dir
     unless defined?(@@data_dir)
-      # RM require 'rbconfig'
+      require 'rbconfig'
       @@data_dir = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'data', 'kramdown'))
-      @@data_dir = File.expand_path(File.join(Config::CONFIG["datadir"], "kramdown")) if !File.exists?(@@data_dir)
+      @@data_dir = File.expand_path(File.join(RbConfig::CONFIG["datadir"], "kramdown")) if !File.exist?(@@data_dir)
       raise "kramdown data directory not found! This is a bug, please report it!" unless File.directory?(@@data_dir)
     end
     @@data_dir
@@ -100,13 +97,13 @@ module Kramdown
     # immediately available and the output can be generated.
     def initialize(source, options = {})
       @options = Options.merge(options).freeze
-      parser = (options[:input] || 'kramdown').to_s
+      parser = (@options[:input] || 'kramdown').to_s
       parser = parser[0..0].upcase + parser[1..-1]
       try_require('parser', parser)
       if Parser.const_defined?(parser)
         @root, @warnings = Parser.const_get(parser).parse(source, @options)
       else
-        raise Kramdown::Error.new("kramdown has no parser to handle the specified input format: #{options[:input]}")
+        raise Kramdown::Error.new("kramdown has no parser to handle the specified input format: #{@options[:input]}")
       end
     end
 
@@ -131,9 +128,9 @@ module Kramdown
 
     # Try requiring a parser or converter class and don't raise an error if the file is not found.
     def try_require(type, name)
-    # RM  require("kramdown/#{type}/#{Utils.snake_case(name)}")
-    # RM  true
-    # RM rescue LoadError
+      require("kramdown/#{type}/#{Utils.snake_case(name)}")
+      true
+    rescue LoadError
       true
     end
     protected :try_require

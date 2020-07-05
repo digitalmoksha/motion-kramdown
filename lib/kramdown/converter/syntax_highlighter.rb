@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2016 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
@@ -46,6 +46,9 @@ module Kramdown
     #                  :block type text correctly wrapped (i.e. normally inside a pre-tag, but may
     #                  also be a table-tag or just a div-tag) but :span type text *without* a
     #                  code-tag!
+    #
+    #                  Also, a syntax highlighter should store the default highlighting language for
+    #                  the invocation in the +opts+ hash under the key :default_lang.
     module SyntaxHighlighter
     end
 

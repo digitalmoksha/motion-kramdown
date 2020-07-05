@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2016 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
@@ -169,6 +169,11 @@ describe 'location' do
       # T
       {:.line-7}
     ),
+    'gh issue 243 - HTML raw elements' => %(
+      <ul class="line-1">
+        <li class="line-2">Test</li>
+      </ul>
+    ),
   }
   test_cases.each do |name, test_string|
     it "Handles #{ name }" do
@@ -211,4 +216,14 @@ describe 'location' do
     end
   end
 
+  it 'handles hard wrapped paragraphs with the GFM parser' do
+    str = "A*b*C\nA*b*C\nA*b*C"
+    doc = Kramdown::Document.new(str, :input => 'GFM', :hard_wrap => true)
+    para = doc.root.children.first
+    1.upto(3) do |line|
+      0.upto(line == 3 ? 2 : 3) do |element|
+        assert_equal(line, para.children[4*(line - 1) + element].options[:location])
+      end
+    end
+  end
 end

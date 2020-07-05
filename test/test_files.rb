@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2016 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
@@ -12,19 +12,60 @@ require 'kramdown'
 require 'yaml'
 require 'tmpdir'
 
+begin
+  require 'kramdown/converter/syntax_highlighter/rouge'
+
+  Kramdown::Converter::SyntaxHighlighter::Rouge.formatter_class.send(:define_method, :format) do |tokens, &b|
+    super(tokens, &b).sub(/<\/code><\/pre>\n?/, "</code></pre>\n")
+  end
+
+  # custom formatter for tests
+  class RougeHTMLFormatters < Kramdown::Converter::SyntaxHighlighter::Rouge.formatter_class
+    tag 'rouge_html_formatters'
+
+    def stream(tokens, &b)
+      yield %(<div class="custom-class">)
+      super
+      yield %(</div>)
+    end
+  end
+rescue LoadError, SyntaxError, NameError
+end
+
 Encoding.default_external = 'utf-8' if RUBY_VERSION >= '1.9'
 
 class TestFiles < Minitest::Test
 
-  EXCLUDE_KD_FILES = [('test/testcases/block/04_header/with_auto_ids.text' if RUBY_VERSION <= '1.8.6'), # bc of dep stringex not working
-                      ('test/testcases/span/03_codespan/highlighting-rouge.text' if RUBY_VERSION < '2.0'), #bc of rouge
-                      ('test/testcases/block/06_codeblock/highlighting-rouge.text' if RUBY_VERSION < '2.0'), #bc of rouge
+  MATHJAX_NODE_AVAILABLE = begin
+                             require 'kramdown/converter/math_engine/mathjaxnode'
+                             Kramdown::Converter::MathEngine::MathjaxNode::AVAILABLE or
+                               warn("Skipping MathjaxNode tests as MathjaxNode is not available")
+                           end
 
+  KATEX_AVAILABLE = begin
+                      / class="katex"/ === Kramdown::Document.
+                        new('$$a$$', {:math_engine => :sskatex}).to_html or
+                        warn("Skipping SsKaTeX tests as SsKaTeX is not available.")
+                    rescue
+                      warn("Skipping SsKaTeX tests as default SsKaTeX config does not work.")
+                    end or warn("Run \"rake dev:test_sskatex_deps\" to see why.")
+
+  EXCLUDE_KD_FILES = [('test/testcases/block/04_header/with_auto_ids.text' if RUBY_VERSION <= '1.8.6'), # bc of dep stringex not working
+                      ('test/testcases/span/03_codespan/rouge/' if RUBY_VERSION < '2.0'), #bc of rouge
+                      ('test/testcases/block/06_codeblock/rouge/' if RUBY_VERSION < '2.0'), #bc of rouge
+                      ('test/testcases/block/15_math/itex2mml.text' if RUBY_PLATFORM == 'java'), # bc of itextomml
+                      ('test/testcases/span/math/itex2mml.text' if RUBY_PLATFORM == 'java'), # bc of itextomml
+                      ('test/testcases/block/15_math/mathjaxnode.text' unless MATHJAX_NODE_AVAILABLE),
+                      ('test/testcases/block/15_math/mathjaxnode_notexhints.text' unless MATHJAX_NODE_AVAILABLE),
+                      ('test/testcases/block/15_math/mathjaxnode_semantics.text' unless MATHJAX_NODE_AVAILABLE),
+                      ('test/testcases/span/math/mathjaxnode.text' unless MATHJAX_NODE_AVAILABLE),
+                      ('test/testcases/block/15_math/sskatex.text' unless KATEX_AVAILABLE),
+                      ('test/testcases/span/math/sskatex.text' unless KATEX_AVAILABLE),
                      ].compact
 
   # Generate test methods for kramdown-to-xxx conversion
   Dir[File.dirname(__FILE__) + '/testcases/**/*.text'].each do |text_file|
-    next if EXCLUDE_KD_FILES.any? {|f| text_file =~ /#{f}$/}
+    next if EXCLUDE_KD_FILES.any? {|f| text_file =~ /#{f}/}
     basename = text_file.sub(/\.text$/, '')
     opts_file = text_file.sub(/\.text$/, '.options')
     (Dir[basename + ".*"] - [text_file, opts_file]).each do |output_file|
@@ -51,14 +92,26 @@ class TestFiles < Minitest::Test
                           'test/testcases/span/03_codespan/highlighting.html', # bc of span elements inside code element
                           'test/testcases/block/04_header/with_auto_ids.html', # bc of auto_ids=true option
                           'test/testcases/block/04_header/header_type_offset.html', # bc of header_offset option
-                          'test/testcases/block/06_codeblock/highlighting-rouge.html', # bc of double surrounding <div>
-                          ('test/testcases/span/03_codespan/highlighting-rouge.html' if RUBY_VERSION < '2.0'),
+                          'test/testcases/block/06_codeblock/rouge/simple.html', # bc of double surrounding <div>
+                          'test/testcases/block/06_codeblock/rouge/multiple.html', # bc of double surrounding <div>
+                          ('test/testcases/span/03_codespan/rouge/simple.html' if RUBY_VERSION < '2.0'),
+                          ('test/testcases/span/03_codespan/rouge/disabled.html' if RUBY_VERSION < '2.0'),
                           'test/testcases/block/15_math/ritex.html', # bc of tidy
                           'test/testcases/span/math/ritex.html', # bc of tidy
                           'test/testcases/block/15_math/itex2mml.html', # bc of tidy
                           'test/testcases/span/math/itex2mml.html', # bc of tidy
+                          'test/testcases/block/15_math/mathjaxnode.html', # bc of tidy
+                          'test/testcases/block/15_math/mathjaxnode_notexhints.html', # bc of tidy
+                          'test/testcases/block/15_math/mathjaxnode_semantics.html', # bc of tidy
+                          'test/testcases/span/math/mathjaxnode.html', # bc of tidy
                           'test/testcases/block/15_math/mathjax_preview.html', # bc of mathjax preview
                           'test/testcases/block/15_math/mathjax_preview_simple.html', # bc of mathjax preview
+                          'test/testcases/block/15_math/mathjax_preview_as_code.html', # bc of mathjax preview
+                          'test/testcases/span/math/sskatex.html', # bc of tidy
+                          'test/testcases/block/15_math/sskatex.html', # bc of tidy
+                          'test/testcases/span/05_html/mark_element.html', # bc of tidy
+                          'test/testcases/block/09_html/xml.html', # bc of tidy
+                          'test/testcases/span/05_html/xml.html', # bc of tidy
                          ].compact
     EXCLUDE_HTML_TEXT_FILES = ['test/testcases/block/09_html/parse_as_span.htmlinput',
                                'test/testcases/block/09_html/parse_as_raw.htmlinput',
@@ -111,6 +164,8 @@ class TestFiles < Minitest::Test
                            'test/testcases/span/01_link/imagelinks.text', # bc of image links
                            'test/testcases/span/01_link/empty_title.text',
                            'test/testcases/span/04_footnote/markers.text', # bc of footnote in header
+                           'test/testcases/block/06_codeblock/with_lang_in_fenced_block_name_with_dash.text',
+                           'test/testcases/block/06_codeblock/with_lang_in_fenced_block_any_char.text',
                           ].compact
     Dir[File.dirname(__FILE__) + '/testcases/**/*.text'].each do |text_file|
       next if EXCLUDE_LATEX_FILES.any? {|f| text_file =~ /#{f}$/}
@@ -148,13 +203,24 @@ class TestFiles < Minitest::Test
                           'test/testcases/span/extension/comment.text',      # bc of comment text modifications (can this be avoided?)
                           'test/testcases/block/04_header/header_type_offset.text', # bc of header_offset being applied twice
                           ('test/testcases/block/04_header/with_auto_ids.text' if RUBY_VERSION <= '1.8.6'), # bc of dep stringex not working
-                          ('test/testcases/span/03_codespan/highlighting-rouge.text' if RUBY_VERSION < '2.0'),
-                          ('test/testcases/block/06_codeblock/highlighting-rouge.text' if RUBY_VERSION < '2.0'), #bc of rouge
+                          ('test/testcases/span/03_codespan/rouge/simple.text' if RUBY_VERSION < '2.0'), #bc of rouge
+                          ('test/testcases/span/03_codespan/rouge/disabled.text' if RUBY_VERSION < '2.0'), #bc of rouge
+                          'test/testcases/block/06_codeblock/rouge/simple.text',
+                          'test/testcases/block/06_codeblock/rouge/multiple.text', # check, what document contain more, than one code block
                           'test/testcases/block/15_math/ritex.text', # bc of tidy
                           'test/testcases/span/math/ritex.text', # bc of tidy
                           'test/testcases/block/15_math/itex2mml.text', # bc of tidy
                           'test/testcases/span/math/itex2mml.text', # bc of tidy
+                          'test/testcases/block/15_math/mathjaxnode.text', # bc of tidy
+                          'test/testcases/block/15_math/mathjaxnode_notexhints.text', # bc of tidy
+                          'test/testcases/block/15_math/mathjaxnode_semantics.text', # bc of tidy
+                          'test/testcases/span/math/mathjaxnode.text', # bc of tidy
+                          'test/testcases/block/15_math/sskatex.text', # bc of tidy
+                          'test/testcases/span/math/sskatex.text', # bc of tidy
                           'test/testcases/span/01_link/link_defs_with_ial.text', # bc of attribute ordering
+                          'test/testcases/span/05_html/mark_element.text', # bc of tidy
+                          'test/testcases/block/09_html/xml.text', # bc of tidy
+                          'test/testcases/span/05_html/xml.text', # bc of tidy
                          ].compact
     Dir[File.dirname(__FILE__) + '/testcases/**/*.text'].each do |text_file|
       next if EXCLUDE_TEXT_FILES.any? {|f| text_file =~ /#{f}$/}
@@ -184,21 +250,33 @@ class TestFiles < Minitest::Test
                              'test/testcases/block/09_html/markdown_attr.html',   # bc of markdown attr
                              'test/testcases/block/09_html/html_to_native/table_simple.html', # bc of invalidly converted simple table
                              'test/testcases/block/06_codeblock/whitespace.html', # bc of entity to char conversion
-                             'test/testcases/block/06_codeblock/highlighting-rouge.html', # bc of double surrounding <div>
+                             'test/testcases/block/06_codeblock/rouge/simple.html', # bc of double surrounding <div>
+                             'test/testcases/block/06_codeblock/rouge/multiple.html', # bc of double surrounding <div>
                              'test/testcases/block/11_ial/simple.html',           # bc of change of ordering of attributes in header
                              'test/testcases/span/03_codespan/highlighting.html', # bc of span elements inside code element
                              'test/testcases/block/04_header/with_auto_ids.html', # bc of auto_ids=true option
                              'test/testcases/block/04_header/header_type_offset.html', # bc of header_offset option
                              'test/testcases/block/16_toc/toc_exclude.html',      # bc of different attribute ordering
                              'test/testcases/span/autolinks/url_links.html',      # bc of quot entity being converted to char
-                             ('test/testcases/span/03_codespan/highlighting-rouge.html' if RUBY_VERSION < '2.0'),
+                             ('test/testcases/span/03_codespan/rouge/simple.html' if RUBY_VERSION < '2.0'),
+                             ('test/testcases/span/03_codespan/rouge/disabled.html' if RUBY_VERSION < '2.0'),
                              'test/testcases/block/15_math/ritex.html', # bc of tidy
                              'test/testcases/span/math/ritex.html', # bc of tidy
                              'test/testcases/block/15_math/itex2mml.html', # bc of tidy
                              'test/testcases/span/math/itex2mml.html', # bc of tidy
+                             'test/testcases/block/15_math/mathjaxnode.html', # bc of tidy
+                             'test/testcases/block/15_math/mathjaxnode_notexhints.html', # bc of tidy
+                             'test/testcases/block/15_math/mathjaxnode_semantics.html', # bc of tidy
+                             'test/testcases/span/math/mathjaxnode.html', # bc of tidy
+                             'test/testcases/block/15_math/sskatex.html', # bc of tidy
+                             'test/testcases/span/math/sskatex.html', # bc of tidy
                              'test/testcases/block/15_math/mathjax_preview.html', # bc of mathjax preview
                              'test/testcases/block/15_math/mathjax_preview_simple.html', # bc of mathjax preview
+                             'test/testcases/block/15_math/mathjax_preview_as_code.html', # bc of mathjax preview
                              'test/testcases/span/01_link/link_defs_with_ial.html', # bc of attribute ordering
+                             'test/testcases/span/05_html/mark_element.html', # bc of tidy
+                             'test/testcases/block/09_html/xml.html', # bc of tidy
+                             'test/testcases/span/05_html/xml.html', # bc of tidy
                             ].compact
     Dir[File.dirname(__FILE__) + '/testcases/**/*.{html,html.19}'].each do |html_file|
       next if EXCLUDE_HTML_KD_FILES.any? {|f| html_file =~ /#{f}(\.19)?$/}
@@ -215,12 +293,24 @@ class TestFiles < Minitest::Test
     end
   end
 
+  # Generate test methods for text-manpage conversion
+  Dir[File.dirname(__FILE__) + '/testcases/man/**/*.text'].each do |text_file|
+    define_method('test_' + text_file.tr('.', '_') + "_to_man") do
+      man_file = text_file.sub(/\.text$/, '.man')
+      doc =  Kramdown::Document.new(File.read(text_file))
+      assert_equal(File.read(man_file), doc.to_man)
+    end
+  end
+
   EXCLUDE_GFM_FILES = [
                        'test/testcases/block/03_paragraph/no_newline_at_end.text',
                        'test/testcases/block/03_paragraph/indented.text',
                        'test/testcases/block/03_paragraph/two_para.text',
+                       'test/testcases/block/03_paragraph/line_break_last_line.text',
                        'test/testcases/block/04_header/atx_header.text',
                        'test/testcases/block/04_header/setext_header.text',
+                       'test/testcases/block/04_header/with_auto_ids.text', # bc of ID generation difference
+                       'test/testcases/block/04_header/with_auto_id_prefix.text', # bc of ID generation difference
                        'test/testcases/block/05_blockquote/indented.text',
                        'test/testcases/block/05_blockquote/lazy.text',
                        'test/testcases/block/05_blockquote/nested.text',
@@ -234,6 +324,7 @@ class TestFiles < Minitest::Test
                        'test/testcases/block/08_list/other_first_element.text',
                        'test/testcases/block/08_list/simple_ul.text',
                        'test/testcases/block/08_list/special_cases.text',
+                       'test/testcases/block/08_list/lazy_and_nested.text', # bc of change in lazy line handling
                        'test/testcases/block/09_html/comment.text',
                        'test/testcases/block/09_html/html_to_native/code.text',
                        'test/testcases/block/09_html/html_to_native/emphasis.text',
@@ -252,6 +343,7 @@ class TestFiles < Minitest::Test
                        'test/testcases/block/14_table/escaping.text',
                        'test/testcases/block/14_table/simple.text',
                        'test/testcases/block/15_math/normal.text',
+                       'test/testcases/block/16_toc/toc_with_footnotes.text', # bc of ID generation difference
                        'test/testcases/encoding.text',
                        'test/testcases/span/01_link/inline.text',
                        'test/testcases/span/01_link/link_defs.text',
@@ -268,11 +360,23 @@ class TestFiles < Minitest::Test
                        'test/testcases/span/extension/comment.text',
                        'test/testcases/span/ial/simple.text',
                        'test/testcases/span/line_breaks/normal.text',
+                       'test/testcases/span/math/normal.text',
                        'test/testcases/span/text_substitutions/entities_as_char.text',
                        'test/testcases/span/text_substitutions/entities.text',
                        'test/testcases/span/text_substitutions/typography.text',
-                       ('test/testcases/span/03_codespan/highlighting-rouge.text' if RUBY_VERSION < '2.0'),
-                       ('test/testcases/block/06_codeblock/highlighting-rouge.text' if RUBY_VERSION < '2.0'), #bc of rouge
+                       ('test/testcases/span/03_codespan/rouge/simple.text' if RUBY_VERSION < '2.0'),
+                       ('test/testcases/span/03_codespan/rouge/disabled.text' if RUBY_VERSION < '2.0'),
+                       ('test/testcases/block/06_codeblock/rouge/simple.text' if RUBY_VERSION < '2.0'), #bc of rouge
+                       ('test/testcases/block/06_codeblock/rouge/disabled.text' if RUBY_VERSION < '2.0'), #bc of rouge
+                       ('test/testcases/block/06_codeblock/rouge/multiple.text' if RUBY_VERSION < '2.0'), #bc of rouge
+                       ('test/testcases/block/15_math/itex2mml.text' if RUBY_PLATFORM == 'java'), # bc of itextomml
+                       ('test/testcases/span/math/itex2mml.text' if RUBY_PLATFORM == 'java'), # bc of itextomml
+                       ('test/testcases/block/15_math/mathjaxnode.text' unless MATHJAX_NODE_AVAILABLE),
+                       ('test/testcases/block/15_math/mathjaxnode_notexhints.text' unless MATHJAX_NODE_AVAILABLE),
+                       ('test/testcases/block/15_math/mathjaxnode_semantics.text' unless MATHJAX_NODE_AVAILABLE),
+                       ('test/testcases/span/math/mathjaxnode.text' unless MATHJAX_NODE_AVAILABLE),
+                       ('test/testcases/block/15_math/sskatex.text' unless KATEX_AVAILABLE),
+                       ('test/testcases/span/math/sskatex.text' unless KATEX_AVAILABLE),
                       ].compact
 
   # Generate test methods for gfm-to-html conversion
@@ -303,11 +407,17 @@ class TestFiles < Minitest::Test
                         'test/testcases/block/04_header/with_auto_ids.text',
                        ].compact
 
+  EXCLUDE_MODIFY = ['test/testcases/block/06_codeblock/rouge/multiple.text', # bc of HTMLFormater in options
+                    ('test/testcases/block/15_math/sskatex.text' unless KATEX_AVAILABLE),
+                    ('test/testcases/span/math/sskatex.text' unless KATEX_AVAILABLE),
+                   ].compact
+
   # Generate test methods for asserting that converters don't modify the document tree.
   Dir[File.dirname(__FILE__) + '/testcases/**/*.text'].each do |text_file|
     opts_file = text_file.sub(/\.text$/, '.options')
     options = File.exist?(opts_file) ? YAML::load(File.read(opts_file)) : {:auto_ids => false, :footnote_nr => 1}
     (Kramdown::Converter.constants.map {|c| c.to_sym} - [:Base, :RemoveHtmlTags, :MathEngine, :SyntaxHighlighter]).each do |conv_class|
+      next if EXCLUDE_MODIFY.any? {|f| text_file =~ /#{f}$/}
       next if conv_class == :Pdf && (RUBY_VERSION < '2.0' || EXCLUDE_PDF_MODIFY.any? {|f| text_file =~ /#{f}$/})
       define_method("test_whether_#{conv_class}_modifies_tree_with_file_#{text_file.tr('.', '_')}") do
         doc = Kramdown::Document.new(File.read(text_file), options)
@@ -325,7 +435,7 @@ class TestFiles < Minitest::Test
     if old.value.kind_of?(Kramdown::Element)
       assert_tree_not_changed(old.value, new.value)
     else
-      assert_equal(old.value, new.value, "value mismatch")
+      assert(old.value == new.value, "value mismatch")
     end
     assert_equal(old.attr, new.attr, "attr mismatch")
     assert_equal(old.options, new.options, "options mismatch")

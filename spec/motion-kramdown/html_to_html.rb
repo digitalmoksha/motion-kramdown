@@ -5,23 +5,41 @@ describe "html-to-{html,kramdown} conversion" do
     warn("Skipping html-to-{html,kramdown} tests because tidy executable is missing")
   else
     EXCLUDE_HTML_FILES = [
-      'test/testcases/block/06_codeblock/whitespace.html',          # bc of span inside pre
-      'test/testcases/block/09_html/simple.html',                   # bc of xml elements
-      'test/testcases/span/03_codespan/highlighting.html',          # bc of span elements inside code element
       'test/testcases/block/04_header/with_auto_ids.html',          # bc of auto_ids=true option
       'test/testcases/block/04_header/header_type_offset.html',     # bc of header_offset option
-      'test/testcases/block/06_codeblock/highlighting-rouge.html',  # bc of double surrounding <div>
-      ('test/testcases/span/03_codespan/highlighting-rouge.html'    if RUBY_VERSION < '2.0'),
+      'test/testcases/block/06_codeblock/whitespace.html',          # bc of span inside pre
+      'test/testcases/block/06_codeblock/rouge/simple.html',        # bc of double surrounding <div>
+      'test/testcases/block/06_codeblock/rouge/multiple.html',      # bc of double surrounding <div>
+      'test/testcases/block/09_html/simple.html',                   # bc of xml elements
+      'test/testcases/block/09_html/xml.html',                      # bc of tidy
       'test/testcases/block/15_math/ritex.html',                    # bc of tidy
-      'test/testcases/span/math/ritex.html',                        # bc of tidy
       'test/testcases/block/15_math/itex2mml.html',                 # bc of tidy
-      'test/testcases/span/math/itex2mml.html',                     # bc of tidy
       'test/testcases/block/15_math/mathjax_preview.html',          # bc of mathjax preview
       'test/testcases/block/15_math/mathjax_preview_simple.html',   # bc of mathjax preview
-                                
+      'test/testcases/block/15_math/mathjax_preview_as_code.html',  # bc no math support yet
       'test/testcases/block/15_math/gh_128.html',                   # bc no math support yet
       'test/testcases/block/15_math/normal.html',                   # bc no math support yet
+
+      'test/testcases/span/03_codespan/highlighting.html',          # bc of span elements inside code element
+      ('test/testcases/span/03_codespan/rouge/simple.html'    if RUBY_VERSION < '2.0'),
+      'test/testcases/span/05_html/mark_element.html',              # bc of tidy
+      'test/testcases/span/05_html/xml.html',                       # bc of tidy
+      'test/testcases/span/math/ritex.html',                        # bc of tidy
+      'test/testcases/span/math/itex2mml.html',                     # bc of tidy
       'test/testcases/span/math/normal.html',                       # bc no math support yet
+
+      'test/testcases/block/16_toc/toc_with_footnotes.html',       # bc of issue with nbsp
+      'test/testcases/block/12_extension/options.html',            # bc of issue with nbsp
+      'test/testcases/block/12_extension/options2.html',           # bc of issue with nbsp
+      'test/testcases/span/04_footnote/footnote_nr.html',          # bc of issue with nbsp
+      'test/testcases/span/04_footnote/inside_footnote.html',      # bc of issue with nbsp
+      'test/testcases/span/04_footnote/backlink_text.html',        # bc of issue with nbsp
+      'test/testcases/span/abbreviations/in_footnote.html',        # bc of issue with nbsp
+
+      'test/testcases/span/math/sskatex.html',                     # bc of tidy
+      'test/testcases/block/15_math/sskatex.html',                 # bc of tidy
+
+      'test/testcases/span/04_footnote/backlink_inline.html',      # bc no math support yet
     ].compact
 
     EXCLUDE_HTML_TEXT_FILES = ['test/testcases/block/09_html/parse_as_span.htmlinput',
@@ -41,7 +59,7 @@ describe "html-to-{html,kramdown} conversion" do
       end
 
       out_files.select {|f, _| File.exist?(f)}.each do |out_file, out_method|
-      
+
         it "#{short_name(html_file)} --> #{File.extname(out_file)}" do
           options   = load_options(opts_file)
           doc       = Kramdown::Document.new(File.read(html_file), options.merge(:input => 'html'))

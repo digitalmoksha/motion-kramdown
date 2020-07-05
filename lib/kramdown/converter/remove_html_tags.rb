@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2016 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
 #
 
-# RM require 'kramdown/converter'
+require 'kramdown/converter'
 
 module Kramdown
 
@@ -30,6 +30,8 @@ module Kramdown
       end
 
       def convert(el)
+        real_el, el = el, el.value if el.type == :footnote
+
         children = el.children.dup
         index = 0
         while index < children.length
@@ -46,7 +48,7 @@ module Kramdown
           end
         end
         el.children = children
-        el
+        real_el || el
       end
 
     end

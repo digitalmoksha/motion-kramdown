@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2016 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
 #
 
-# RM require 'kramdown/parser/kramdown/escaped_chars'
+require 'kramdown/parser/kramdown/escaped_chars'
 
 module Kramdown
   module Parser
@@ -18,10 +18,11 @@ module Kramdown
         id.gsub(/[\s]+/, ' ').downcase
       end
 
-      LINK_DEFINITION_START = /^#{OPT_SPACE}\[([^\n\]]+)\]:[ \t]*(?:<(.*?)>|([^'"\n]*?\S[^'"\n]*?))[ \t]*?(?:\n?[ \t]*?(["'])(.+?)\4[ \t]*?)?\n/
+      LINK_DEFINITION_START = /^#{OPT_SPACE}\[([^\n\]]+)\]:[ \t]*(?:<(.*?)>|([^\n]*?\S[^\n]*?))(?:(?:[ \t]*?\n|[ \t]+?)[ \t]*?(["'])(.+?)\4)?[ \t]*?\n/
 
       # Parse the link definition at the current location.
       def parse_link_definition
+        return false if @src[3].to_s =~ /[ \t]+["']/
         @src.pos += @src.matched_size
         link_id, link_url, link_title = normalize_link_id(@src[1]), @src[2] || @src[3], @src[5]
         warning("Duplicate link ID '#{link_id}' on line #{@src.current_line_number} - overwriting") if @link_defs[link_id]
@@ -76,7 +77,7 @@ module Kramdown
           count = count + (@src[1] ? -1 : 1)
           count - el.children.select {|c| c.type == :img}.size == 0
         end
-        if !found || (link_type == :a && el.children.empty?)
+        unless found
           @src.revert_pos(saved_pos)
           add_text(result)
           return

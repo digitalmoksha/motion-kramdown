@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2016 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
 #
 
-# RM require 'set'
-# RM require 'kramdown/converter'
+require 'set'
+require 'kramdown/converter'
 
 module Kramdown
 
@@ -84,7 +84,12 @@ module Kramdown
       def convert_codeblock(el, opts)
         show_whitespace = el.attr['class'].to_s =~ /\bshow-whitespaces\b/
         lang = extract_code_language(el.attr)
-        if show_whitespace || lang
+
+        if @options[:syntax_highlighter] == :minted &&
+            (highlighted_code = highlight_code(el.value, lang, :block))
+          @data[:packages] << 'minted'
+          "#{latex_link_target(el)}#{highlighted_code}\n"
+        elsif show_whitespace || lang
           options = []
           options << "showspaces=%s,showtabs=%s" % (show_whitespace ? ['true', 'true'] : ['false', 'false'])
           options << "language=#{lang}" if lang
@@ -132,7 +137,7 @@ module Kramdown
       end
 
       def convert_li(el, opts)
-        "\\item #{latex_link_target(el, true)}#{inner(el, opts).sub(/\n+\Z/, '')}\n"
+        "\\item{} #{latex_link_target(el, true)}#{inner(el, opts).sub(/\n+\Z/, '')}\n"
       end
 
       def convert_dt(el, opts)
@@ -205,9 +210,9 @@ module Kramdown
       def convert_a(el, opts)
         url = el.attr['href']
         if url.start_with?('#')
-          "\\hyperlink{#{escape(url[1..-1])}}{#{inner(el, opts)}}"
+          "\\hyperlink{#{url[1..-1].gsub('%', "\\%")}}{#{inner(el, opts)}}"
         else
-          "\\href{#{escape(url)}}{#{inner(el, opts)}}"
+          "\\href{#{url.gsub('%', "\\%")}}{#{inner(el, opts)}}"
         end
       end
 
@@ -226,7 +231,14 @@ module Kramdown
       end
 
       def convert_codespan(el, opts)
-        "{\\tt #{latex_link_target(el)}#{escape(el.value)}}"
+        lang = extract_code_language(el.attr)
+        if @options[:syntax_highlighter] == :minted &&
+            (highlighted_code = highlight_code(el.value, lang, :span))
+          @data[:packages] << 'minted'
+          "#{latex_link_target(el)}#{highlighted_code}"
+        else
+          "\\texttt{#{latex_link_target(el)}#{escape(el.value)}}"
+        end
       end
 
       def convert_footnote(el, opts)
@@ -522,7 +534,11 @@ module Kramdown
         :laquo => '\guillemotleft{}', :raquo => '\guillemotright{}'
       } # :nodoc:
       def convert_typographic_sym(el, opts)
-        TYPOGRAPHIC_SYMS[el.value]
+        if (result = @options[:typographic_symbols][el.value])
+          escape(result)
+        else
+          TYPOGRAPHIC_SYMS[el.value]
+        end
       end
 
       def convert_smart_quote(el, opts)
@@ -586,7 +602,9 @@ module Kramdown
         "~"  => "\\ensuremath{\\sim}",
         "|"  => "\\textbar{}",
         "<"  => "\\textless{}",
-        ">"  => "\\textgreater{}"
+        ">"  => "\\textgreater{}",
+        "["  => "{[}",
+        "]"  => "{]}",
       }.merge(Hash[*("{}$%&_#".scan(/./).map {|c| [c, "\\#{c}"]}.flatten)]) # :nodoc:
       ESCAPE_RE = Regexp.union(*ESCAPE_MAP.collect {|k,v| k}) # :nodoc:
 

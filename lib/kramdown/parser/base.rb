@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2016 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
 #
 
-# RM require 'kramdown/utils'
-# RM require 'kramdown/parser'
+require 'kramdown/utils'
+require 'kramdown/parser'
 
 module Kramdown
 
@@ -89,12 +89,10 @@ module Kramdown
       # Modify the string +source+ to be usable by the parser (unifies line ending characters to
       # +\n+ and makes sure +source+ ends with a new line character).
       def adapt_source(source)
-        if source.respond_to?(:encode)
-          if !source.valid_encoding?
-            raise "The source text contains invalid characters for the used encoding #{source.encoding}"
-          end
-          source = source.encode('UTF-8')
+        unless source.valid_encoding?
+          raise "The source text contains invalid characters for the used encoding #{source.encoding}"
         end
+        source = source.encode('UTF-8')
         source.gsub(/\r\n?/, "\n").chomp + "\n"
       end
 
@@ -113,16 +111,12 @@ module Kramdown
       # method works correctly under Ruby 1.8 and Ruby 1.9.
       def extract_string(range, strscan)
         result = nil
-        if strscan.string.respond_to?(:encoding)
-          begin
-            enc = strscan.string.encoding
-            strscan.string.force_encoding('ASCII-8BIT')
-            result = strscan.string[range].force_encoding(enc)
-          ensure
-            strscan.string.force_encoding(enc)
-          end
-        else
-          result = strscan.string[range]
+        begin
+          enc = strscan.string.encoding
+          strscan.string.force_encoding('ASCII-8BIT')
+          result = strscan.string[range].force_encoding(enc)
+        ensure
+          strscan.string.force_encoding(enc)
         end
         result
       end

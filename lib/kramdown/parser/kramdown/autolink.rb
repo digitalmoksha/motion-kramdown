@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2016 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
@@ -11,13 +11,7 @@ module Kramdown
   module Parser
     class Kramdown
 
-      if RUBY_VERSION == '1.8.5'
-        ACHARS = '\w\x80-\xFF'
-      elsif RUBY_VERSION < '1.9.0'
-        ACHARS = '\w'
-      else
-        ACHARS = '[[:alnum:]]'
-      end
+      ACHARS = '[[:alnum:]]_'
       AUTOLINK_START_STR = "<((mailto|https?|ftps?):.+?|[-.#{ACHARS}]+@[-#{ACHARS}]+(?:\.[-#{ACHARS}]+)*\.[a-z]+)>"
       AUTOLINK_START = /#{AUTOLINK_START_STR}/u
 

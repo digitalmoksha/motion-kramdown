@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2016 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
 #
 
-# RM require 'erb'
-# RM require 'kramdown/utils'
-# RM require 'kramdown/document'
+require 'erb'
+require 'kramdown/utils'
+require 'kramdown/document'
 
 module Kramdown
 
@@ -67,7 +67,7 @@ module Kramdown
         false
       end
 
-      # Returns whether the template should be applied ater the conversion of the tree.
+      # Returns whether the template should be applied after the conversion of the tree.
       #
       # Defaults to true.
       def apply_template_after?
@@ -182,8 +182,8 @@ module Kramdown
 
       # Extract the code block/span language from the attributes.
       def extract_code_language(attr)
-        if attr['class'] && attr['class'] =~ /\blanguage-\w+\b/
-          attr['class'].scan(/\blanguage-(\w+)\b/).first.first
+        if attr['class'] && attr['class'] =~ /\blanguage-\S+/
+          attr['class'].scan(/\blanguage-(\S+)/).first.first
         end
       end
 
@@ -192,7 +192,7 @@ module Kramdown
       # *Warning*: This version will modify the given attributes if a language is present.
       def extract_code_language!(attr)
         lang = extract_code_language(attr)
-        attr['class'] = attr['class'].sub(/\blanguage-\w+\b/, '').strip if lang
+        attr['class'] = attr['class'].sub(/\blanguage-\S+/, '').strip if lang
         attr.delete('class') if lang && attr['class'].empty?
         lang
       end
@@ -231,10 +231,7 @@ module Kramdown
       # ID.
       def generate_id(str)
         str = ::Kramdown::Utils::Unidecoder.decode(str) if @options[:transliterated_header_ids]
-        gen_id = str.gsub(/^[^a-zA-Z]+/, '')
-        gen_id.tr!('^a-zA-Z0-9 -', '')
-        gen_id.tr!(' ', '-')
-        gen_id.downcase!
+        gen_id = basic_generate_id(str)
         gen_id = 'section' if gen_id.length == 0
         @used_ids ||= {}
         if @used_ids.has_key?(gen_id)
@@ -243,6 +240,16 @@ module Kramdown
           @used_ids[gen_id] = 0
         end
         @options[:auto_id_prefix] + gen_id
+      end
+
+      # The basic version of the ID generator, without any special provisions for empty or unique
+      # IDs.
+      def basic_generate_id(str)
+        gen_id = str.gsub(/^[^a-zA-Z]+/, '')
+        gen_id.tr!('^a-zA-Z0-9 -', '')
+        gen_id.tr!(' ', '-')
+        gen_id.downcase!
+        gen_id
       end
 
       SMART_QUOTE_INDICES = {:lsquo => 0, :rsquo => 1, :ldquo => 2, :rdquo => 3} # :nodoc:

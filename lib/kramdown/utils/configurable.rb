@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2016 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
@@ -29,7 +29,7 @@ module Kramdown
         singleton_class = (class << self; self; end)
         singleton_class.send(:define_method, :configurables) do
           @_configurables ||= Hash.new {|h, k| h[k] = {}}
-        end
+        end unless respond_to?(:configurables)
         singleton_class.send(:define_method, name) do |data|
           configurables[name][data]
         end

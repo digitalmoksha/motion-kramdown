@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2016 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
 #
 
-# RM require 'prawn'
-# RM require 'prawn/table'
-# RM require 'kramdown/converter'
-# RM require 'kramdown/utils'
-# RM require 'open-uri'
+require 'prawn'
+require 'prawn/table'
+require 'kramdown/converter'
+require 'kramdown/utils'
+require 'open-uri'
 
 module Kramdown
 

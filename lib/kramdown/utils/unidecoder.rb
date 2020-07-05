@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2016 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
@@ -19,7 +19,7 @@ module Kramdown
       # RM TODO path = $:.find {|dir| File.directory?(File.join(File.expand_path(dir), "stringex", "unidecoder_data"))}
       path = 'lib' # RM TODO
 
-      if RUBY_VERSION <= '1.8.6' || !path
+      if !path
         def self.decode(string)
           string
         end

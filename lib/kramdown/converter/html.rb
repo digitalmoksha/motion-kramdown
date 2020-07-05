@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2016 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
 #
 
-# RM require 'kramdown/parser'
-# RM require 'kramdown/converter'
-# RM require 'kramdown/utils'
+require 'kramdown/parser'
+require 'kramdown/converter'
+require 'kramdown/utils'
 
 module Kramdown
 
@@ -92,10 +92,11 @@ module Kramdown
       def convert_codeblock(el, indent)
         attr = el.attr.dup
         lang = extract_code_language!(attr)
-        highlighted_code = highlight_code(el.value, lang, :block)
+        hl_opts = {}
+        highlighted_code = highlight_code(el.value, el.options[:lang] || lang, :block, hl_opts)
 
         if highlighted_code
-          add_syntax_highlighter_to_class_attr(attr)
+          add_syntax_highlighter_to_class_attr(attr, lang || hl_opts[:default_lang])
           "#{' '*indent}<div#{html_attributes(attr)}>#{highlighted_code}#{' '*indent}</div>\n"
         else
           result = escape_html(el.value)
@@ -164,7 +165,14 @@ module Kramdown
       alias :convert_dd :convert_li
 
       def convert_dt(el, indent)
-        format_as_block_html(el.type, el.attr, inner(el, indent), indent)
+        attr = el.attr.dup
+        @stack.last.options[:ial][:refs].each do |ref|
+          if ref =~ /\Aauto_ids(?:-([\w-]+))?/
+            attr['id'] = ($1 ? $1 : '') << basic_generate_id(el.options[:raw_text])
+            break
+          end
+        end if !attr['id'] && @stack.last.options[:ial] && @stack.last.options[:ial][:refs]
+        format_as_block_html(el.type, attr, inner(el, indent), indent)
       end
 
       def convert_html_element(el, indent)
@@ -235,14 +243,7 @@ module Kramdown
       end
 
       def convert_a(el, indent)
-        res = inner(el, indent)
-        attr = el.attr.dup
-        if attr['href'].start_with?('mailto:')
-          mail_addr = attr['href'][7..-1]
-          attr['href'] = obfuscate('mailto') << ":" << obfuscate(mail_addr)
-          res = obfuscate(res) if res == mail_addr
-        end
-        format_as_span_html(el.type, attr, res)
+        format_as_span_html(el.type, el.attr, inner(el, indent))
       end
 
       def convert_img(el, indent)
@@ -252,9 +253,10 @@ module Kramdown
       def convert_codespan(el, indent)
         attr = el.attr.dup
         lang = extract_code_language(attr)
-        result = highlight_code(el.value, lang, :span)
+        hl_opts = {}
+        result = highlight_code(el.value, lang, :span, hl_opts)
         if result
-          add_syntax_highlighter_to_class_attr(attr)
+          add_syntax_highlighter_to_class_attr(attr, hl_opts[:default_lang])
         else
           result = escape_html(el.value)
         end
@@ -303,7 +305,11 @@ module Kramdown
         :raquo => [::Kramdown::Utils::Entities.entity('raquo')]
       } # :nodoc:
       def convert_typographic_sym(el, indent)
-        TYPOGRAPHIC_SYMS[el.value].map {|e| entity_to_str(e)}.join('')
+        if (result = @options[:typographic_symbols][el.value])
+          escape_html(result, :text)
+        else
+          TYPOGRAPHIC_SYMS[el.value].map {|e| entity_to_str(e)}.join('')
+        end
       end
 
       def convert_smart_quote(el, indent)
@@ -313,10 +319,14 @@ module Kramdown
       def convert_math(el, indent)
         if (result = format_math(el, :indent => indent))
           result
-        elsif el.options[:category] == :block
-          format_as_block_html('pre', el.attr, "$$\n#{el.value}\n$$", indent)
         else
-          format_as_span_html('span', el.attr, "$#{el.value}$")
+          attr = el.attr.dup
+          (attr['class'] = (attr['class'] || '') << " kdmath").lstrip!
+          if el.options[:category] == :block
+            format_as_block_html('div', attr, "$$\n#{el.value}\n$$", indent)
+          else
+            format_as_span_html('span', attr, "$#{el.value}$")
+          end
         end
       end
 
@@ -330,7 +340,7 @@ module Kramdown
       def convert_root(el, indent)
         result = inner(el, indent)
         if @footnote_location
-          result.sub!(/#{@footnote_location}/, footnote_content)
+          result.sub!(/#{@footnote_location}/, footnote_content.gsub(/\\/, "\\\\\\\\"))
         else
           result << footnote_content
         end
@@ -341,7 +351,7 @@ module Kramdown
                  else
                    ''
                  end
-          result.sub!(/#{@toc_code.last}/, text)
+          result.sub!(/#{@toc_code.last}/, text.gsub(/\\/, "\\\\\\\\"))
         end
         result
       end
@@ -362,9 +372,11 @@ module Kramdown
         "#{' '*indent}<#{name}#{html_attributes(attr)}>\n#{body}#{' '*indent}</#{name}>\n"
       end
 
-      # Add the syntax highlighter name to the 'class' attribute of the given attribute hash.
-      def add_syntax_highlighter_to_class_attr(attr)
+      # Add the syntax highlighter name to the 'class' attribute of the given attribute hash. And
+      # overwrites or add a "language-LANG" part using the +lang+ parameter if +lang+ is not nil.
+      def add_syntax_highlighter_to_class_attr(attr, lang = nil)
         (attr['class'] = (attr['class'] || '') + " highlighter-#{@options[:syntax_highlighter]}").lstrip!
+        attr['class'].sub!(/\blanguage-\S+|(^)/) { "language-#{lang}#{$1 ? ' ' : ''}" } if lang
       end
 
       # Generate and return an element tree for the table of contents.
@@ -378,7 +390,7 @@ module Kramdown
           a = Element.new(:a, nil)
           a.attr['href'] = "##{id}"
           a.attr['id'] = "#{sections.attr['id']}-#{id}"
-          a.children.concat(remove_footnotes(Marshal.load(Marshal.dump(children))))
+          a.children.concat(fix_for_toc_entry(Marshal.load(Marshal.dump(children))))
           li.children.last.children << a
           li.children << Element.new(type)
 
@@ -405,6 +417,21 @@ module Kramdown
         sections
       end
 
+      # Fixes the elements for use in a TOC entry.
+      def fix_for_toc_entry(elements)
+        remove_footnotes(elements)
+        unwrap_links(elements)
+        elements
+      end
+
+      # Remove all link elements by unwrapping them.
+      def unwrap_links(elements)
+        elements.map! do |c|
+          unwrap_links(c.children)
+          c.type == :a ? c.children : c
+        end.flatten!
+      end
+
       # Remove all footnotes from the given elements.
       def remove_footnotes(elements)
         elements.delete_if do |c|
@@ -419,7 +446,7 @@ module Kramdown
         text.each_byte do |b|
           result << (b > 128 ? b.chr : "&#%03d;" % b)
         end
-        result.force_encoding(text.encoding) if result.respond_to?(:force_encoding)
+        result.force_encoding(text.encoding)
         result
       end
 
@@ -430,28 +457,33 @@ module Kramdown
         ol = Element.new(:ol)
         ol.attr['start'] = @footnote_start if @footnote_start != 1
         i = 0
+        backlink_text = escape_html(@options[:footnote_backlink], :text)
         while i < @footnotes.length
           name, data, _, repeat = *@footnotes[i]
           li = Element.new(:li, nil, {'id' => "fn:#{name}"})
           li.children = Marshal.load(Marshal.dump(data.children))
-          
-          #------------------------------------------------------------------------------
-          # RM Crash due to an object being autoreleased one too many times in RubyMotion.
-          # pre-initializing `para` before it's assigned in the `if` statement seems to 
-          # fix it.
-          para = nil
 
-          if li.children.last.type == :p
-            para = li.children.last
+          para = nil
+          if li.children.last.type == :p || @options[:footnote_backlink_inline]
+            parent = li
+            while !parent.children.empty? && ![:p, :header].include?(parent.children.last.type)
+              parent = parent.children.last
+            end
+            para = parent.children.last
             insert_space = true
-          else
+          end
+
+          unless para
             li.children << (para = Element.new(:p))
             insert_space = false
           end
 
-          para.children << Element.new(:raw, FOOTNOTE_BACKLINK_FMT % [insert_space ? ' ' : '', name, "&#8617;"])
-          (1..repeat).each do |index|
-            para.children << Element.new(:raw, FOOTNOTE_BACKLINK_FMT % [" ", "#{name}:#{index}", "&#8617;<sup>#{index+1}</sup>"])
+          unless @options[:footnote_backlink].empty?
+            nbsp = entity_to_str(ENTITY_NBSP)
+            para.children << Element.new(:raw, FOOTNOTE_BACKLINK_FMT % [insert_space ? nbsp : '', name, backlink_text])
+            (1..repeat).each do |index|
+              para.children << Element.new(:raw, FOOTNOTE_BACKLINK_FMT % [nbsp, "#{name}:#{index}", "#{backlink_text}<sup>#{index+1}</sup>"])
+            end
           end
 
           ol.children << Element.new(:raw, convert(li, 4))

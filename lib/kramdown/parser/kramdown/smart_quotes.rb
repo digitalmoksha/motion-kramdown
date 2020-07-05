@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 #--
-# Copyright (C) 2009-2015 Thomas Leitner <t_leitner@gmx.at>
+# Copyright (C) 2009-2016 Thomas Leitner <t_leitner@gmx.at>
 #
 # This file is part of kramdown which is licensed under the MIT.
 #++
@@ -123,7 +123,7 @@ module Kramdown
 
       SQ_RULES = [
                   [/("|')(?=[_*]{1,2}\S)/, [:lquote1]],
-                  [/("|')(?=#{SQ_PUNCT}\B)/, [:rquote1]],
+                  [/("|')(?=#{SQ_PUNCT}(?!\.\.)\B)/, [:rquote1]],
                   # Special case for double sets of quotes, e.g.:
                   #   <p>He said, "'Quoted' words in a larger quote."</p>
                   [/(\s?)"'(?=\w)/, [1, :ldquo, :lsquo]],
@@ -136,7 +136,7 @@ module Kramdown
                   # Single/double closing quotes:
                   [/(#{SQ_CLOSE})('|")/, [1, :rquote2]],
                   # Special case for e.g. "<i>Custer</i>'s Last Stand."
-                  [/("|')(\s|s\b|$)/, [:rquote1, 2]],
+                  [/("|')(?=\s|s\b|$)/, [:rquote1]],
                   # Any remaining single quotes should be opening ones:
                   [/(.?)'/m, [1, :lsquo]],
                   [/(.?)"/m, [1, :ldquo]],
