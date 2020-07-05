@@ -1,6 +1,6 @@
 module MotionKramdown
 
   # The motion-kramdown version.
-  VERSION = '1.15.0'
+  VERSION = '1.16.2'
 
 end
