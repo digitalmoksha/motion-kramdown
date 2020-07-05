@@ -5,7 +5,7 @@
 [![Platform](https://img.shields.io/badge/platform-macos%20|%20ios-lightgrey.svg)](https://shields.io/)
 [![Language](https://img.shields.io/badge/language-RubyMotion-red.svg)](http://www.rubymotion.com)
 
-[kramdown](https://github.com/gettalong/kramdown) Markdown parser, for use with RubyMotion on iOS and OS X.
+[kramdown](https://github.com/gettalong/kramdown) Markdown parser, for use with RubyMotion on iOS and macOS.
 
 Currently implements: _kramdown_ 1.16.2
 
