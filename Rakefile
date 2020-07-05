@@ -11,6 +11,7 @@ require 'motion-benchmark'
 
 begin
   require 'bundler'
+  require 'motion/project/template/gem/gem_tasks'
   testing ? Bundler.require(:default, :spec) : Bundler.require
 rescue LoadError
 end
