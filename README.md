@@ -2,6 +2,8 @@
 
 [![Gem Version](https://badge.fury.io/rb/motion-kramdown.svg)](http://badge.fury.io/rb/motion-kramdown)
 [![Build Status](https://travis-ci.org/digitalmoksha/motion-kramdown.svg?branch=master)](https://travis-ci.org/digitalmoksha/motion-kramdown)
+[![Platform](https://img.shields.io/badge/platform-macos%20|%20ios-lightgrey.svg)](https://shields.io/)
+[![Language](https://img.shields.io/badge/language-RubyMotion-red.svg)](http://www.rubymotion.com)
 
 [kramdown](https://github.com/gettalong/kramdown) Markdown parser, for use with RubyMotion on iOS and OS X.
 
